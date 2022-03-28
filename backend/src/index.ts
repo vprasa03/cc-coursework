@@ -1,1 +1,3 @@
-console.log("logger...");
+import { logger } from "./logger";
+
+logger("Logging...");

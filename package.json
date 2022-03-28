@@ -2,7 +2,7 @@
 	"name": "cc-coursework",
 	"version": "1.0.0",
 	"description": "Coursework for cloud computing module 2021-22",
-	"main": "out/index.js",
+	"main": "backend/dist/index.js",
 	"scripts": {
 		"start": "fbw -t backend/src -r 'tsc -p backend/src' -t backend/dist -r 'node backend/dist/index.js'",
 		"start:no-watchman": "tsc -p backend/src && node backend/dist/index.js",
