@@ -1,9 +1,6 @@
 # Mac OS
 .DS_Store
 
-# TS build artefacts
-**/dist/**
-
 # Logs
 logs
 *.log
