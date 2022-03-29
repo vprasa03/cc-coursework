@@ -23,7 +23,7 @@ class RootRoute {
 	}
 
 	/**
-	 * Get bids router
+	 * Getter for router
 	 * @returns Router object
 	 */
 	public getRouter() {
