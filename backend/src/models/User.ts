@@ -1,10 +1,12 @@
-import { Schema, model, connect, Types } from "mongoose";
+import { Schema, model, Types } from "mongoose";
+import { AuctionModel } from "./Auction";
 
-interface UserModel {
-	_id?: Types.ObjectId;
-	email?: string;
+export interface UserModel {
+	_id: Types.ObjectId;
+	email: string;
 	name?: string;
-	password?: string;
+	password: string;
+	auctions?: AuctionModel["_id"][];
 }
 
 export class User {
@@ -14,6 +16,7 @@ export class User {
 			name: { type: String },
 			email: { type: String, required: true },
 			password: { type: String, required: true },
+			auctions: { type: [Schema.Types.ObjectId] },
 		})
 	);
 
@@ -22,12 +25,26 @@ export class User {
 	 * @param data new user data
 	 * @returns new user
 	 */
-	public static async createUser(
-		data: UserModel & { email: string; password: string }
+	public static async createUser<T = Omit<UserModel, "_id">>(data: T) {
+		try {
+			const user = new User.model<T>(data);
+			await user.save();
+			return user;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Find and update user with given data
+	 * @param data updated user data
+	 * @returns updated user
+	 */
+	public static async updateUser(
+		data: Partial<UserModel> & Pick<UserModel, "_id">
 	) {
 		try {
-			const user = new User.model<UserModel>(data);
-			await user.save();
+			const user = await User.model.findByIdAndUpdate(data._id);
 			return user;
 		} catch (error) {
 			throw error;
@@ -67,20 +84,6 @@ export class User {
 	}
 
 	/**
-	 * Find and update user with given data
-	 * @param data updated user data
-	 * @returns updated user
-	 */
-	public static async updateUser(data: User & { _id: Types.ObjectId }) {
-		try {
-			const user = await User.model.findByIdAndUpdate(data._id);
-			return user;
-		} catch (error) {
-			throw error;
-		}
-	}
-
-	/**
 	 * Find and delete user with given id
 	 * @param userId _id of the user to delete
 	 * @returns deleted user
@@ -93,19 +96,4 @@ export class User {
 			throw error;
 		}
 	}
-}
-
-run().catch((err) => console.log(err));
-
-async function run() {
-	await connect("mongodb://localhost:27017/test");
-
-	// const doc = new UserModel<User>({
-	// 	name: "Bill",
-	// 	email: "bill@initech.com",
-	// 	password: "https://i.imgur.com/dM7Thhn.png",
-	// });
-	// await doc.save();
-
-	// console.log(doc.email); // 'bill@initech.com'
 }
