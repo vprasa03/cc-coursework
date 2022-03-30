@@ -1,2 +1,2 @@
-export * from "./AuctionsRoute";
-export * from "./UserRoute";
+export * from "./auctionsRoute";
+export * from "./userRoute";

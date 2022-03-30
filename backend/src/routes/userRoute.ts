@@ -2,7 +2,6 @@ import { Router } from "express";
 
 /**
  * Route "/user"
- * @public
  */
 class UserRoute {
 	private router: Router;

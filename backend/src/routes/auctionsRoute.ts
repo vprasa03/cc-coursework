@@ -6,7 +6,6 @@ import { CreationType, unixTs } from "../utils";
 
 /**
  * Route "/auctions"
- * @public
  */
 class AuctionsRoute {
 	private router: Router;
