@@ -19,11 +19,19 @@ export class App {
 	}
 
 	/**
+	 * Use middleware
+	 * @param middleware
+	 */
+	public static useMiddleware(middleware: any) {
+		App.expressInstance.use(middleware);
+	}
+
+	/**
 	 * Use router on route
 	 * @param route
 	 * @param router
 	 */
-	public static use(route: string, router: Router) {
+	public static useRoute(route: string, router: Router) {
 		App.expressInstance.use(route, router);
 	}
 }

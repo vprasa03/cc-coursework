@@ -1,15 +1,17 @@
 import { connect } from "mongoose";
 import dotenv = require("dotenv");
+import bodyParser = require("body-parser");
+import { isNativeError } from "util/types";
 
 import { App } from "./App";
-import { bidsRoute, rootRoute } from "./routes";
-import { isNativeError } from "util/types";
+import { auctionsRoute, userRoute } from "./routes";
 
 const envVars = dotenv.config();
 
 function onDBConnect() {
-	App.use("/", rootRoute.getRouter());
-	App.use("/bids", bidsRoute.getRouter());
+	App.useMiddleware(bodyParser.json());
+	App.useRoute("/user", userRoute.getRouter());
+	App.useRoute("/auctions", auctionsRoute.getRouter());
 
 	App.start(3000);
 }
