@@ -1,24 +1,24 @@
 import { Router } from "express";
 
 /**
- * Bids route ("/bids/")
+ * Route "/user"
  * @public
  */
-class BidsRoute {
+class UserRoute {
 	private router: Router;
 
 	constructor() {
 		this.router = Router();
 
-		this.getHome();
+		this.getUser();
 	}
 
 	/**
-	 * GET "/bids"
+	 * GET "/"
 	 */
-	private getHome() {
+	private getUser() {
 		this.router.get("/", (_req, res) => {
-			res.send("Bids!");
+			res.send("Home page!");
 		});
 	}
 
@@ -31,4 +31,4 @@ class BidsRoute {
 	}
 }
 
-export const bidsRoute = new BidsRoute();
+export const userRoute = new UserRoute();

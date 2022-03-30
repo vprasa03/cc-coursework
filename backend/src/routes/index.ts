@@ -1,2 +1,2 @@
-export * from "./BidsRoute";
-export * from "./RootRoute";
+export * from "./AuctionsRoute";
+export * from "./UserRoute";
