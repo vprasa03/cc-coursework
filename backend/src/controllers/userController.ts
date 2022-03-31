@@ -1,17 +1,19 @@
+import { Model } from "mongoose";
+
 import { CreationType } from "../utils";
 import { User, UserModel } from "../models";
 
-export class UserController {
-	private static model = UserModel;
+class UserController {
+	constructor(private model: Model<User>) {}
 
 	/**
 	 * Create new user with given data
 	 * @param data new user data
 	 * @returns new user
 	 */
-	public static async createUser<T = CreationType<User>>(data: T) {
+	public async createUser<T = CreationType<User>>(data: T) {
 		try {
-			const user = new UserController.model<T>(data);
+			const user = new this.model<T>(data);
 			await user.save();
 			return user;
 		} catch (error) {
@@ -24,9 +26,9 @@ export class UserController {
 	 * @param data updated user data
 	 * @returns updated user
 	 */
-	public static async updateUser(data: Partial<User> & Pick<User, "_id">) {
+	public async updateUser(data: Partial<User> & Pick<User, "_id">) {
 		try {
-			const user = await UserController.model.findByIdAndUpdate(data._id);
+			const user = await this.model.findByIdAndUpdate(data._id);
 			return user;
 		} catch (error) {
 			throw error;
@@ -38,9 +40,9 @@ export class UserController {
 	 * @param userId _id of the user to find
 	 * @returns user
 	 */
-	public static async getUser(userId: User["_id"]) {
+	public async getUser(userId: User["_id"]) {
 		try {
-			const user = await UserController.model.findById(userId);
+			const user = await this.model.findById(userId);
 			return user;
 		} catch (error) {
 			throw error;
@@ -52,9 +54,9 @@ export class UserController {
 	 * @param userIds _ids of the users to find
 	 * @returns users
 	 */
-	public static async getUsers(userIds: User["_id"]) {
+	public async getUsers(userIds: User["_id"]) {
 		try {
-			const users = await UserController.model.find({
+			const users = await this.model.find({
 				_id: {
 					$in: userIds,
 				},
@@ -70,12 +72,14 @@ export class UserController {
 	 * @param userId _id of the user to delete
 	 * @returns deleted user
 	 */
-	public static async deleteUser(userId: User["_id"]) {
+	public async deleteUser(userId: User["_id"]) {
 		try {
-			const user = await UserController.model.findByIdAndDelete(userId);
+			const user = await this.model.findByIdAndDelete(userId);
 			return user;
 		} catch (error) {
 			throw error;
 		}
 	}
 }
+
+export const userController = new UserController(UserModel);

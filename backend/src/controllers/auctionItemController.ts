@@ -1,19 +1,19 @@
+import { Model } from "mongoose";
+
 import { AuctionItem, AuctionItemModel } from "../models";
 import { CreationType } from "../utils";
 
-export class AuctionItemController {
-	private static model = AuctionItemModel;
+class AuctionItemController {
+	constructor(private model: Model<AuctionItem>) {}
 
 	/**
 	 * Create new auctin item with given data
 	 * @param data auction item data
 	 * @returns new auction item
 	 */
-	public static async createAuctionItem<T = CreationType<AuctionItem>>(
-		data: T
-	) {
+	public async createAuctionItem<T = CreationType<AuctionItem>>(data: T) {
 		try {
-			const auctionItem = new AuctionItemController.model<T>(data);
+			const auctionItem = new this.model<T>(data);
 			await auctionItem.save();
 			return auctionItem;
 		} catch (error) {
@@ -26,15 +26,13 @@ export class AuctionItemController {
 	 * @param data updated item data
 	 * @returns updated auction item
 	 */
-	public static async updateAuctionItem(
+	public async updateAuctionItem(
 		data: Partial<AuctionItem> &
 			Pick<AuctionItem, "_id"> &
 			Omit<AuctionItem, "createTime">
 	) {
 		try {
-			const auctionItem = await AuctionItemController.model.findByIdAndUpdate(
-				data._id
-			);
+			const auctionItem = await this.model.findByIdAndUpdate(data._id);
 			return auctionItem;
 		} catch (error) {
 			throw error;
@@ -46,9 +44,9 @@ export class AuctionItemController {
 	 * @param itemId _id of the item to find
 	 * @returns auction item
 	 */
-	public static async getAuctionItem(itemId: AuctionItem["_id"]) {
+	public async getAuctionItem(itemId: AuctionItem["_id"]) {
 		try {
-			const auctionItem = await AuctionItemController.model.findById(itemId);
+			const auctionItem = await this.model.findById(itemId);
 			return auctionItem;
 		} catch (error) {
 			throw error;
@@ -60,9 +58,9 @@ export class AuctionItemController {
 	 * @param itemIds _ids of the items to find
 	 * @returns auction items
 	 */
-	public static async getAuctionItems(itemIds: AuctionItem["_id"][]) {
+	public async getAuctionItems(itemIds: AuctionItem["_id"][]) {
 		try {
-			const auctionItems = await AuctionItemController.model.find({
+			const auctionItems = await this.model.find({
 				_id: {
 					$in: itemIds,
 				},
@@ -78,12 +76,16 @@ export class AuctionItemController {
 	 * @param itemId _id of the item to delete
 	 * @returns deleted auction item
 	 */
-	public static async deleteAuctionItem(itemId: AuctionItem["_id"]) {
+	public async deleteAuctionItem(itemId: AuctionItem["_id"]) {
 		try {
-			const item = await AuctionItemController.model.findByIdAndDelete(itemId);
+			const item = await this.model.findByIdAndDelete(itemId);
 			return item;
 		} catch (error) {
 			throw error;
 		}
 	}
 }
+
+export const auctionItemController = new AuctionItemController(
+	AuctionItemModel
+);

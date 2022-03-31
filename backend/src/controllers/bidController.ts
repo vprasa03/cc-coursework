@@ -1,17 +1,19 @@
+import { Model } from "mongoose";
+
 import { CreationType } from "../utils";
 import { Bid, BidModel } from "../models";
 
-export class BidController {
-	private static model = BidModel;
+class BidController {
+	constructor(private model: Model<Bid>) {}
 
 	/**
 	 * Create new bid for given auction item
 	 * @param data new bid
 	 * @returns new bid
 	 */
-	public static async createBid<T = CreationType<Bid>>(data: T) {
+	public async createBid<T = CreationType<Bid>>(data: T) {
 		try {
-			const bid = new BidController.model<T>(data);
+			const bid = new this.model<T>(data);
 			await bid.save();
 			return bid;
 		} catch (error) {
@@ -24,9 +26,9 @@ export class BidController {
 	 * @param bidId _id of the bid to find
 	 * @returns bid
 	 */
-	public static async getBid(bidId: Bid["_id"]) {
+	public async getBid(bidId: Bid["_id"]) {
 		try {
-			const bid = await BidController.model.findById(bidId);
+			const bid = await this.model.findById(bidId);
 			return bid;
 		} catch (error) {
 			throw error;
@@ -38,9 +40,9 @@ export class BidController {
 	 * @param bidIds _ids of the bids to find
 	 * @returns bids
 	 */
-	public static async getBids(bidIds: Bid["_id"][]) {
+	public async getBids(bidIds: Bid["_id"][]) {
 		try {
-			const bids = await BidController.model.find({
+			const bids = await this.model.find({
 				_id: {
 					$in: bidIds,
 				},
@@ -51,3 +53,5 @@ export class BidController {
 		}
 	}
 }
+
+export const bidController = new BidController(BidModel);
