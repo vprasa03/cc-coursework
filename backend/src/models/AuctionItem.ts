@@ -5,15 +5,18 @@ export interface AuctionItem {
 	createTime: number;
 	details: string;
 	name: string;
-	condition: "New" | "Used";
+	condition: "new" | "used";
 }
 
 export const AuctionItemModel = model<AuctionItem>(
 	"AuctionItem",
-	new Schema<AuctionItem>({
-		createTime: { type: Number, required: true },
-		name: { type: String, required: true },
-		details: { type: String, required: true },
-		condition: { type: String, required: true },
-	})
+	new Schema<AuctionItem>(
+		{
+			createTime: { type: Number, required: true },
+			name: { type: String, required: true },
+			details: { type: String, required: true },
+			condition: { type: String, required: true },
+		},
+		{ collection: "AuctionItem" }
+	)
 );

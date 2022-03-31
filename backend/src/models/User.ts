@@ -14,12 +14,15 @@ export interface User {
 
 export const UserModel = model<User>(
 	"User",
-	new Schema<User>({
-		name: { type: String },
-		email: { type: String, required: true },
-		password: { type: String, required: true },
-		auctions: { type: [Schema.Types.ObjectId] },
-		bids: { type: [Schema.Types.ObjectId] },
-		createTime: { type: Number, required: true },
-	})
+	new Schema<User>(
+		{
+			name: { type: String },
+			email: { type: String, required: true },
+			password: { type: String, required: true },
+			auctions: { type: [Schema.Types.ObjectId] },
+			bids: { type: [Schema.Types.ObjectId] },
+			createTime: { type: Number, required: true },
+		},
+		{ collection: "User" }
+	)
 );

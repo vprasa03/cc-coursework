@@ -19,16 +19,19 @@ export interface Auction {
 
 export const AuctionModel = model<Auction>(
 	"Auction",
-	new Schema<Auction>({
-		by: { type: Schema.Types.ObjectId, required: true },
-		createTime: { type: Number, required: true },
-		item: { type: Schema.Types.ObjectId, required: true },
-		bids: { type: [Schema.Types.ObjectId] },
-		participants: { type: [Schema.Types.ObjectId] },
-		startBid: { type: Number, required: true },
-		highestBid: { type: Number },
-		endTime: { type: Number, required: true },
-		winner: { type: Schema.Types.ObjectId },
-		status: { type: String, required: true },
-	})
+	new Schema<Auction>(
+		{
+			by: { type: Schema.Types.ObjectId, required: true },
+			createTime: { type: Number, required: true },
+			item: { type: Schema.Types.ObjectId, required: true },
+			bids: { type: [Schema.Types.ObjectId] },
+			participants: { type: [Schema.Types.ObjectId] },
+			startBid: { type: Number, required: true },
+			highestBid: { type: Number },
+			endTime: { type: Number, required: true },
+			winner: { type: Schema.Types.ObjectId },
+			status: { type: String, required: true },
+		},
+		{ collection: "Auction" }
+	)
 );

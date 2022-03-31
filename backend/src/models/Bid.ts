@@ -12,10 +12,13 @@ export interface Bid {
 
 export const BidModel = model<Bid>(
 	"Bid",
-	new Schema<Bid>({
-		forItem: { type: Schema.Types.ObjectId, required: true },
-		by: { type: Schema.Types.ObjectId, required: true },
-		amount: { type: Number, required: true },
-		createTime: { type: Number, required: true },
-	})
+	new Schema<Bid>(
+		{
+			forItem: { type: Schema.Types.ObjectId, required: true },
+			by: { type: Schema.Types.ObjectId, required: true },
+			amount: { type: Number, required: true },
+			createTime: { type: Number, required: true },
+		},
+		{ collection: "Bid" }
+	)
 );
