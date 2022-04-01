@@ -1,7 +1,7 @@
 import { Model } from "mongoose";
 
 import { CreationType } from "../utils";
-import { User, UserModel } from "../models";
+import { Auction, Bid, User, UserModel } from "../models";
 
 class UserController {
 	constructor(private model: Model<User>) {}
@@ -23,12 +23,50 @@ class UserController {
 
 	/**
 	 * Find and update user with given data
+	 * @param userId id of user
 	 * @param data updated user data
 	 * @returns updated user
 	 */
-	public async updateUser(data: Partial<User> & Pick<User, "_id">) {
+	public async updateUser(userId: User["_id"], data: Partial<User>) {
 		try {
-			const user = await this.model.findByIdAndUpdate(data._id);
+			const user = await this.model.findByIdAndUpdate(userId, data);
+			return user;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Add auction to user on participation
+	 * @param userId user id
+	 * @param auctionId auction id
+	 * @returns updated user
+	 */
+	public async beAuctionParticipant(
+		userId: User["_id"],
+		auctionId: Auction["_id"]
+	) {
+		try {
+			const user = await this.model.findByIdAndUpdate(userId, {
+				$addToSet: { auctions: auctionId },
+			});
+			return user;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Add bid to user's bids
+	 * @param userId id of user
+	 * @param bidId id of bid
+	 * @returns updated user
+	 */
+	public async addAuctionBid(userId: User["_id"], bidId: Bid["_id"]) {
+		try {
+			const user = await this.model.findByIdAndUpdate(userId, {
+				$addToSet: { bids: bidId },
+			});
 			return user;
 		} catch (error) {
 			throw error;
@@ -54,7 +92,7 @@ class UserController {
 	 * @param userIds _ids of the users to find
 	 * @returns users
 	 */
-	public async getUsers(userIds: User["_id"]) {
+	public async getUsers(userIds: User["_id"][]) {
 		try {
 			const users = await this.model.find({
 				_id: {

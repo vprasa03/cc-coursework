@@ -1,7 +1,7 @@
 import { Model } from "mongoose";
 
 import { CreationType } from "../utils";
-import { Auction, AuctionModel } from "../models";
+import { Auction, AuctionModel, Bid, User } from "../models";
 
 class AuctionController {
 	constructor(private model: Model<Auction>) {}
@@ -23,16 +23,47 @@ class AuctionController {
 
 	/**
 	 * Find and update auction with given data
+	 * @param id id of auction to update
 	 * @param data updated auction data
 	 * @returns updated auction
 	 */
-	public async updateAuction(
-		data: Partial<Auction> &
-			Pick<Auction, "_id"> &
-			Omit<Auction, "by" | "item" | "startBid" | "createTime">
-	) {
+	public async updateAuction(id: Auction["_id"], data: Partial<Auction>) {
 		try {
-			const auction = await this.model.findByIdAndUpdate(data._id);
+			const auction = await this.model.findByIdAndUpdate(id, data);
+			return auction;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Add bid to auction
+	 * @param id id of auction to update
+	 * @param bid new bid id
+	 * @returns updated auction
+	 */
+	public async addAuctionBid(id: Auction["_id"], bid: Bid["_id"]) {
+		try {
+			const auction = await this.model.findByIdAndUpdate(id, {
+				$push: { bids: bid },
+			});
+			return auction;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Add participant to auction
+	 * @param id id of item to update
+	 * @param user new participant's id
+	 * @returns updated auction
+	 */
+	public async addAuctionParticipant(id: Auction["_id"], user: User["_id"]) {
+		try {
+			const auction = await this.model.findByIdAndUpdate(id, {
+				$addToSet: { participants: user },
+			});
 			return auction;
 		} catch (error) {
 			throw error;
@@ -46,7 +77,8 @@ class AuctionController {
 	 */
 	public async getAuction(auctionId: Auction["_id"]) {
 		try {
-			const auction = await this.model.findById(auctionId);
+			const auction = await this.model.findById(auctionId).lean();
+
 			return auction;
 		} catch (error) {
 			throw error;
@@ -65,7 +97,6 @@ class AuctionController {
 				.sort({ createTime: -1 })
 				.skip(page > 0 ? (page - 1) * limit : 0)
 				.limit(limit);
-			console.log(auctions);
 
 			return auctions;
 		} catch (error) {

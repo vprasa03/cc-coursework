@@ -1,19 +1,29 @@
 import { Router } from "express";
+import bodyParser = require("body-parser");
 import express = require("express");
+
+import { auctionRoute, auctionsRoute, authRoute } from "./routes";
 
 /**
  * The App
  * @public
  */
-export class App {
-	private static expressInstance = express();
+class AuctionApp {
+	private expressInstance = express();
+
+	constructor() {
+		this.useMiddleware(bodyParser.json());
+		this.useRoute("/auth", authRoute.getRouter());
+		this.useRoute("/auctions", auctionsRoute.getRouter());
+		this.useRoute("/auction", auctionRoute.getRouter());
+	}
 
 	/**
 	 * Start express server
 	 * @param portNo Port for express.listen
 	 */
-	public static start(portNo: number) {
-		App.expressInstance.listen(portNo, () => {
+	public start(portNo: number) {
+		this.expressInstance.listen(portNo, () => {
 			console.log(`Express server running on port ${portNo}`);
 		});
 	}
@@ -22,8 +32,8 @@ export class App {
 	 * Use middleware
 	 * @param middleware
 	 */
-	public static useMiddleware(middleware: any) {
-		App.expressInstance.use(middleware);
+	public useMiddleware(middleware: any) {
+		this.expressInstance.use(middleware);
 	}
 
 	/**
@@ -31,7 +41,9 @@ export class App {
 	 * @param route
 	 * @param router
 	 */
-	public static useRoute(route: string, router: Router) {
-		App.expressInstance.use(route, router);
+	public useRoute(route: string, router: Router) {
+		this.expressInstance.use(`/api${route}`, router);
 	}
 }
+
+export const app = new AuctionApp();

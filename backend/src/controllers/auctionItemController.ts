@@ -22,24 +22,6 @@ class AuctionItemController {
 	}
 
 	/**
-	 * Find and update item with given data
-	 * @param data updated item data
-	 * @returns updated auction item
-	 */
-	public async updateAuctionItem(
-		data: Partial<AuctionItem> &
-			Pick<AuctionItem, "_id"> &
-			Omit<AuctionItem, "createTime">
-	) {
-		try {
-			const auctionItem = await this.model.findByIdAndUpdate(data._id);
-			return auctionItem;
-		} catch (error) {
-			throw error;
-		}
-	}
-
-	/**
 	 * Find auction item with given id
 	 * @param itemId _id of the item to find
 	 * @returns auction item
@@ -66,6 +48,24 @@ class AuctionItemController {
 				},
 			});
 			return auctionItems;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Find and update auction item with given id
+	 * @param itemId _id of the item to delete
+	 * @param data
+	 * @returns updated auction item
+	 */
+	public async updateAuctionItem(
+		itemId: AuctionItem["_id"],
+		data: Partial<AuctionItem>
+	) {
+		try {
+			const item = await this.model.findByIdAndUpdate(itemId, data);
+			return item;
 		} catch (error) {
 			throw error;
 		}

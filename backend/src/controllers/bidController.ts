@@ -22,20 +22,6 @@ class BidController {
 	}
 
 	/**
-	 * Find bid with given id
-	 * @param bidId _id of the bid to find
-	 * @returns bid
-	 */
-	public async getBid(bidId: Bid["_id"]) {
-		try {
-			const bid = await this.model.findById(bidId);
-			return bid;
-		} catch (error) {
-			throw error;
-		}
-	}
-
-	/**
 	 * Find bids with given ids
 	 * @param bidIds _ids of the bids to find
 	 * @returns bids

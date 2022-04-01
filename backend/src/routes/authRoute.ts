@@ -1,9 +1,9 @@
 import { Router } from "express";
 
 /**
- * Route "/user"
+ * Route "/api/auth"
  */
-class UserRoute {
+class AuthRoute {
 	private router: Router;
 
 	constructor() {
@@ -30,4 +30,4 @@ class UserRoute {
 	}
 }
 
-export const userRoute = new UserRoute();
+export const authRoute = new AuthRoute();

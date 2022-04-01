@@ -17,7 +17,7 @@ export const UserModel = model<User>(
 	new Schema<User>(
 		{
 			name: { type: String },
-			email: { type: String, required: true },
+			email: { type: String, required: true, unique: true },
 			password: { type: String, required: true },
 			auctions: { type: [Schema.Types.ObjectId] },
 			bids: { type: [Schema.Types.ObjectId] },

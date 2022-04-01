@@ -1,20 +1,13 @@
 import { connect } from "mongoose";
 import dotenv = require("dotenv");
-import bodyParser = require("body-parser");
 import { isNativeError } from "util/types";
 
-import { App } from "./App";
-import { auctionRoute, auctionsRoute, userRoute } from "./routes";
+import { app } from "./App";
 
 const envVars = dotenv.config();
 
 function onDBConnect() {
-	App.useMiddleware(bodyParser.json());
-	App.useRoute("/user", userRoute.getRouter());
-	App.useRoute("/auctions", auctionsRoute.getRouter());
-	App.useRoute("/auction", auctionRoute.getRouter());
-
-	App.start(3000);
+	app.start(3000);
 }
 
 const dbUrl = envVars.parsed?.MURL;
