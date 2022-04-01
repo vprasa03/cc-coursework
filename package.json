@@ -1,11 +1,10 @@
 {
 	"name": "cc-coursework",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"description": "Coursework for cloud computing module 2021-22",
-	"main": "backend/dist/index.js",
 	"scripts": {
-		"start:app": "tsc -p backend/src && node backend/dist/index.js",
-		"start:dev": "NODE_ENV=development fbw -t backend/src -r 'tsc -p backend/src' -t backend/dist -r 'node backend/dist/index.js'",
+		"start:app": "tsc -p api/src && node api/dist/index.js",
+		"start:dev": "NODE_ENV=development fbw -t api/src -r 'tsc -p api/src' -t api/dist -r 'node backend/dist/index.js'",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {

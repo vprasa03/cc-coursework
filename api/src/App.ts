@@ -2,7 +2,7 @@ import { Router } from "express";
 import bodyParser = require("body-parser");
 import express = require("express");
 
-import { auctionRoute, auctionsRoute, authRoute } from "./routes";
+import { auctionRoute, auctionsRoute, authRoute, userRoute } from "./routes";
 
 /**
  * The App
@@ -14,6 +14,7 @@ class AuctionApp {
 	constructor() {
 		this.useMiddleware(bodyParser.json());
 		this.useRoute("/auth", authRoute.getRouter());
+		this.useRoute("/user", userRoute.getRouter());
 		this.useRoute("/auctions", auctionsRoute.getRouter());
 		this.useRoute("/auction", auctionRoute.getRouter());
 	}
