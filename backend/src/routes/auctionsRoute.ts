@@ -3,7 +3,7 @@ import { Router } from "express";
 import { auctionController } from "../controllers";
 
 /**
- * Route "/auctions"
+ * Route "/api/auctions"
  */
 class AuctionsRoute {
 	private router = Router();
@@ -27,8 +27,8 @@ class AuctionsRoute {
 				const limit = parseInt(req.params.limit) || 0;
 
 				res.send(await auctionController.getAuctions(page, limit));
-			} catch (error) {
-				res.send({ error });
+			} catch (error: any) {
+				res.send({ error: error.message });
 			}
 		});
 	}
