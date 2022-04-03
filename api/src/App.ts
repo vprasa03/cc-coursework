@@ -2,7 +2,13 @@ import { Router } from "express";
 import bodyParser = require("body-parser");
 import express = require("express");
 
-import { auctionRoute, auctionsRoute, authRoute, userRoute } from "./routes";
+import {
+	auctionRoute,
+	auctionsRoute,
+	authRoute,
+	bidsRoute,
+	userRoute,
+} from "./routes";
 
 /**
  * The App
@@ -17,6 +23,7 @@ class AuctionApp {
 		this.useRoute("/user", userRoute.getRouter());
 		this.useRoute("/auctions", auctionsRoute.getRouter());
 		this.useRoute("/auction", auctionRoute.getRouter());
+		this.useRoute("/bids", bidsRoute.getRouter());
 	}
 
 	/**

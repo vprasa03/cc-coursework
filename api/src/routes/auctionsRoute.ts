@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { auctionController } from "../controllers";
+import { verifyToken } from "../middlewares";
 
 /**
  * Route "/api/auctions"
@@ -21,16 +22,22 @@ class AuctionsRoute {
 			limit: string;
 		};
 
-		this.router.get<ReqParams>("/:page?/:limit?", async (req, res) => {
-			try {
-				const page = parseInt(req.params.page) || 0;
-				const limit = parseInt(req.params.limit) || 0;
+		this.router.get<ReqParams>(
+			"/:page?/:limit?",
+			verifyToken,
+			async (req, res) => {
+				try {
+					const page = parseInt(req.params.page) || 0;
+					const limit = parseInt(req.params.limit) || 0;
 
-				res.send(await auctionController.getAuctions(page, limit));
-			} catch (error: any) {
-				res.send({ error: error.message });
+					res
+						.status(200)
+						.send(await auctionController.getAuctions(page, limit));
+				} catch (error: any) {
+					res.status(400).send({ error: error.message });
+				}
 			}
-		});
+		);
 	}
 
 	/**

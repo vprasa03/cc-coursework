@@ -7,7 +7,7 @@ export interface Bid {
 	forAuction: Auction["_id"];
 	byUser: User["_id"];
 	amount: number;
-	createTime: number;
+	entryTime: number;
 }
 
 export const BidModel = model<Bid>(
@@ -17,7 +17,7 @@ export const BidModel = model<Bid>(
 			forAuction: { type: Schema.Types.ObjectId, required: true },
 			byUser: { type: Schema.Types.ObjectId, required: true },
 			amount: { type: Number, required: true },
-			createTime: { type: Number, required: true },
+			entryTime: { type: Number, required: true },
 		},
 		{ collection: "Bid" }
 	)

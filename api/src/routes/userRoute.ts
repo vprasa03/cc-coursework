@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { verifyToken } from "../middlewares";
 
 /**
  * Route "/api/user"
@@ -10,14 +11,24 @@ class UserRoute {
 		this.router = Router();
 
 		this.getUser();
+		this.updateUser();
 	}
 
 	/**
-	 * GET "/"
+	 * GET "/:id"
 	 */
 	private getUser() {
-		this.router.get("/", (_req, res) => {
-			res.send("Home page!");
+		this.router.get("/:id", (_req, res) => {
+			res.status(200).send("Home page!");
+		});
+	}
+
+	/**
+	 * PATCH "/"
+	 */
+	private updateUser() {
+		this.router.patch("/", verifyToken, (_req, res) => {
+			res.status(200).send("Home page!");
 		});
 	}
 

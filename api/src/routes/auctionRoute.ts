@@ -2,14 +2,16 @@ import { Router } from "express";
 
 import {
 	auctionController,
+	auctionItemController,
 	bidController,
 	userController,
 } from "../controllers";
-import { Auction } from "../models";
-import { CreationType, unixTs } from "../utils";
+import { verifyToken } from "../middlewares";
+import { Auction, User } from "../models";
+import { AuctionStatus, EntryType, isToday, unixTs } from "../utils";
+import { auctionValidation, dateCompareValidation } from "../validations";
 import { auctionBidRoute } from "./auctionBidRoute";
 import { auctionItemRoute } from "./auctionItemRoute";
-import { auctionParticipateRoute } from "./auctionParticipateRoute";
 
 /**
  * Route "/api/auction"
@@ -24,7 +26,6 @@ class AuctionRoute {
 
 		this.auctionItemRoutes();
 		this.auctionBidRoutes();
-		this.auctionParticipateRoutes();
 	}
 
 	/**
@@ -36,17 +37,14 @@ class AuctionRoute {
 		this.router.get<ReqParams>("/:id", async (req, res) => {
 			try {
 				const auction = await auctionController.getAuction(req.params.id);
-				if (auction?.bids && auction?.participants) {
+				if (auction?.bids && auction?.bids.length > 0) {
 					const bids = await bidController.getBids(auction.bids);
-					const participants = await userController.getUsers(
-						auction.participants
-					);
-					res.send({ ...auction, bids, participants });
+					res.status(400).send({ ...auction, bids });
 				} else {
-					res.send(auction);
+					res.status(200).send(auction);
 				}
 			} catch (error: any) {
-				res.send({ error: error.message });
+				res.status(400).send({ error: error.message });
 			}
 		});
 	}
@@ -55,21 +53,43 @@ class AuctionRoute {
 	 * POST "/"
 	 */
 	private createAuctionRoute() {
-		type ReqBody = CreationType<Auction>;
+		type ReqBody = EntryType<Auction>;
 
 		this.router.post<{}, {}, ReqBody>("/", async (req, res) => {
 			try {
+				let validationErr = auctionValidation(req.body);
+				if (validationErr) throw new Error(validationErr);
+				validationErr = dateCompareValidation(
+					req.body.startDate,
+					req.body.endDate
+				);
+				if (validationErr) throw new Error(validationErr);
+
+				const user = <User["_id"]>(<unknown>req.headers.user);
+				if (
+					user !==
+					(await auctionItemController.getAuctionItem(req.body.item))?.ownedBy
+				)
+					throw new Error(
+						`User ${req.body.by} does not own item ${req.body.item}`
+					);
+
 				const auction = await auctionController.createAuction({
 					createTime: unixTs(),
-					by: req.body.by,
+					by: user,
 					item: req.body.item,
 					startBid: req.body.startBid,
-					endTime: req.body.endTime,
-					status: "open",
+					highestBid: -1,
+					startDate: req.body.startDate,
+					endDate: req.body.endDate,
+					status: isToday(req.body.startDate)
+						? AuctionStatus.open
+						: AuctionStatus.entry,
 				});
-				res.send(auction);
+				await userController.addAuction(auction.by, auction._id);
+				res.status(200).send(auction);
 			} catch (error: any) {
-				res.send({ error: error.message });
+				res.status(400).send({ error: error.message });
 			}
 		});
 	}
@@ -83,33 +103,41 @@ class AuctionRoute {
 
 		this.router.patch<ReqParams, {}, ReqBody>("/", async (req, res) => {
 			try {
-				const auction = <Auction>await auctionController.updateAuction(
-					req.params.id,
-					{
-						...(req.body.endTime ? { endTime: req.body.endTime } : {}),
-						...(req.body.winner ? { winner: req.body.winner } : {}),
-						...(req.body.status ? { status: req.body.status } : {}),
-					}
+				const user = <User["_id"]>(<unknown>req.headers.user);
+				let auction = <Auction>(
+					await auctionController.getAuction(req.params.id)
 				);
-				res.send(auction);
+
+				if (auction) {
+					if (auction.by !== user)
+						throw new Error("Auction not created by user");
+					if (auction.status === AuctionStatus.closed)
+						throw new Error("Auction is closed");
+					if (
+						auction.bids &&
+						auction.bids.length > 0 &&
+						auction.item !== req.body.item
+					)
+						throw new Error("Bids have been made. Cannot change item now.");
+
+					let validationErr = auctionValidation(req.body);
+					if (validationErr) throw new Error(validationErr);
+					if (req.body.startDate && req.body.endDate)
+						validationErr = dateCompareValidation(
+							req.body.startDate,
+							req.body.endDate
+						);
+					if (validationErr) throw new Error(validationErr);
+
+					auction = <Auction>(
+						await auctionController.updateAuction(req.params.id, req.body)
+					);
+					res.status(200).send(auction);
+				} else throw new Error(`Auction ${req.params.id} does not exist`);
 			} catch (error: any) {
-				res.send({ error: error.message });
+				res.status(400).send({ error: error.message });
 			}
 		});
-	}
-
-	/**
-	 * Use "/:id/participate"
-	 */
-	private auctionParticipateRoutes() {
-		this.router.use(
-			"/:id/participate",
-			(req, _res, next) => {
-				req.body.forAuction = req.params.id;
-				next();
-			},
-			auctionParticipateRoute.getRouter()
-		);
 	}
 
 	/**
@@ -122,6 +150,7 @@ class AuctionRoute {
 				req.body.forAuction = req.params.id;
 				next();
 			},
+			verifyToken,
 			auctionBidRoute.getRouter()
 		);
 	}
@@ -130,13 +159,7 @@ class AuctionRoute {
 	 * Use "/item"
 	 */
 	private auctionItemRoutes() {
-		this.router.use(
-			"/item",
-			(_req, _res, next) => {
-				next();
-			},
-			auctionItemRoute.getRouter()
-		);
+		this.router.use("/item", verifyToken, auctionItemRoute.getRouter());
 	}
 
 	/**

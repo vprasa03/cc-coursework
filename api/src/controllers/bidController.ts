@@ -1,6 +1,6 @@
 import { Model } from "mongoose";
 
-import { CreationType } from "../utils";
+import { EntryType } from "../utils";
 import { Bid, BidModel } from "../models";
 
 class BidController {
@@ -11,11 +11,11 @@ class BidController {
 	 * @param data new bid
 	 * @returns new bid
 	 */
-	public async createBid<T = CreationType<Bid>>(data: T) {
+	public async createBid<T = EntryType<Bid>>(data: T) {
 		try {
 			const bid = new this.model<T>(data);
 			await bid.save();
-			return bid;
+			return bid.toObject();
 		} catch (error) {
 			throw error;
 		}
@@ -28,11 +28,13 @@ class BidController {
 	 */
 	public async getBids(bidIds: Bid["_id"][]) {
 		try {
-			const bids = await this.model.find({
-				_id: {
-					$in: bidIds,
-				},
-			});
+			const bids = await this.model
+				.find({
+					_id: {
+						$in: bidIds,
+					},
+				})
+				.lean();
 			return bids;
 		} catch (error) {
 			throw error;

@@ -9,7 +9,7 @@ export interface User {
 	password: string;
 	auctions?: Auction["_id"][];
 	bids?: Bid["_id"][];
-	createTime: number;
+	entryTime: number;
 }
 
 export const UserModel = model<User>(
@@ -21,7 +21,7 @@ export const UserModel = model<User>(
 			password: { type: String, required: true },
 			auctions: { type: [Schema.Types.ObjectId] },
 			bids: { type: [Schema.Types.ObjectId] },
-			createTime: { type: Number, required: true },
+			entryTime: { type: Number, required: true },
 		},
 		{ collection: "User" }
 	)

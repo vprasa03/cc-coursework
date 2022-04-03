@@ -22,8 +22,8 @@ function connectDB(successCB: () => void) {
 		} else {
 			throw new Error("DB url not found!");
 		}
-	} catch (error) {
-		console.error(error, "\nRetry DB connection...");
+	} catch (error: any) {
+		console.error(error.message, "\nRetry DB connection...");
 		connectDB(successCB);
 	}
 }

@@ -1,18 +1,22 @@
 import { Schema, model, Types } from "mongoose";
+import { ItemCondition } from "../utils";
+import { User } from "./User";
 
 export interface AuctionItem {
 	_id: Types.ObjectId;
-	createTime: number;
+	entryTime: number;
+	ownedBy: User["_id"];
 	details: string;
 	name: string;
-	condition: "new" | "used";
+	condition: ItemCondition;
 }
 
 export const AuctionItemModel = model<AuctionItem>(
 	"AuctionItem",
 	new Schema<AuctionItem>(
 		{
-			createTime: { type: Number, required: true },
+			entryTime: { type: Number, required: true },
+			ownedBy: { type: Schema.Types.ObjectId, required: true },
 			name: { type: String, required: true },
 			details: { type: String, required: true },
 			condition: { type: String, required: true },
