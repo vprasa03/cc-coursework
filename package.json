@@ -4,7 +4,7 @@
 	"description": "Coursework for cloud computing module 2021-22",
 	"scripts": {
 		"start:app": "tsc -p api/src && node api/dist/index.js",
-		"start:dev": "NODE_ENV=development fbw -t api/src -r 'tsc -p api/src' -t api/dist -r 'node backend/dist/index.js'",
+		"start:dev": "NODE_ENV=development fbw -t api/src -r 'tsc -p api/src' -t api/dist -r 'node api/dist/index.js'",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
@@ -18,7 +18,9 @@
 	},
 	"homepage": "https://github.com/vprasa03/cc-coursework#readme",
 	"devDependencies": {
+		"@types/bcryptjs": "^2.4.2",
 		"@types/express": "^4.17.13",
+		"@types/jsonwebtoken": "^8.5.8",
 		"@types/mongoose": "^5.11.97",
 		"@types/node": "^17.0.23",
 		"@vigi-p/fbw": "^2.1.11",
