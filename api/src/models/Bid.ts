@@ -10,6 +10,9 @@ export interface Bid {
 	entryTime: number;
 }
 
+/**
+ * mongoose model for bids
+ */
 export const BidModel = model<Bid>(
 	"Bid",
 	new Schema<Bid>(

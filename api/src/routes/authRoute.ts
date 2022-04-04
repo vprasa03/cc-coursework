@@ -24,6 +24,7 @@ class AuthRoute {
 
 	/**
 	 * POST "/signup"
+	 * Signup for new users
 	 */
 	private postSignup() {
 		type ReqBody = EntryType<User>;
@@ -53,6 +54,7 @@ class AuthRoute {
 
 	/**
 	 * POST "/reset-pass"
+	 * Password reset for existing users
 	 */
 	private postResetPass() {
 		type ReqBody = EntryType<User>;
@@ -80,6 +82,7 @@ class AuthRoute {
 
 	/**
 	 * POST "/login"
+	 * Login for existing users
 	 */
 	private postLogin() {
 		type ReqBody = EntryType<User>;

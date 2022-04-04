@@ -1,6 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { verify, JwtPayload } from "jsonwebtoken";
 
+/**
+ * Express middleware to verify user authorisation
+ * @param req express Request
+ * @param res express Resonse
+ * @param next express NextFunction
+ */
 export function verifyToken<P = {}, Q = {}, B = {}>(
 	req: Request<P, Q, B>,
 	res: Response,

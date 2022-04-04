@@ -16,6 +16,7 @@ class BidsRoute {
 
 	/**
 	 * GET "/:bids"
+	 * Find bids given a json-stringified array of bid ids
 	 */
 	private getBidsRoute() {
 		type ReqParams = {

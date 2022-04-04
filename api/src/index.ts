@@ -6,12 +6,19 @@ import { app } from "./App";
 
 const envVars = dotenv.config();
 
+/**
+ * Start the server on successful connection to MongoDB
+ */
 function onDBConnect() {
 	app.start(3000);
 }
 
-const dbUrl = envVars.parsed?.MURL;
+const dbUrl = envVars.parsed?.MURL; // Get MongoDB url
 
+/**
+ * Connect to MongoDB
+ * @param successCB Callback on successful connect
+ */
 function connectDB(successCB: () => void) {
 	try {
 		if (dbUrl) {

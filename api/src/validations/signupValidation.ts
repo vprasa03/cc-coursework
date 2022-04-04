@@ -1,8 +1,12 @@
 import Joi from "joi";
-
 import { User } from "../models";
 import { EntryType } from "../utils";
 
+/**
+ * Validate signup details
+ * @param data signup details
+ * @returns error messages if any
+ */
 export const signupValidation = (data: EntryType<User>) =>
 	Joi.object({
 		email: Joi.string().required().min(6).max(256).email(),

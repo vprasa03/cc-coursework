@@ -1,9 +1,31 @@
 import Joi from "joi";
-const dateFormat = "DD-MM-YYYY";
+
+const dateFormat = "DD-MM-YYYY"; // The accepted date format
+
+/**
+ * Get error message for incorrect date format
+ * @param key startDate OR endDate
+ * @param format The date format
+ * @returns formatted error message
+ */
 const dateFormatErrMsg = (key: string, format: string) =>
 	`${key} must have format ${format}`;
+
+/**
+ * Get error message for invalid dates
+ * @param key1 startDate OR endDate
+ * @param key2 year, month OR date
+ * @param val value of year, month OR date
+ * @returns formatted error message
+ */
 const invalidMsg = (key1: string, key2: string, val: number) =>
 	`${val} is invalid ${key2} for ${key1}`;
+
+/**
+ * Custom validator for checking startDate and endDate
+ * @param key startDate OR endDate
+ * @returns the date unless an error is thrown
+ */
 const customDateValidator = (key: string) => (dateString: string) => {
 	const [d, m, y] = dateString.split("-").map(parseInt);
 	if (
@@ -27,6 +49,11 @@ const customDateValidator = (key: string) => (dateString: string) => {
 	return dateString;
 };
 
+/**
+ * Validate data for an auction
+ * @param data the auction
+ * @returns error messages if any
+ */
 export const auctionValidation = (data: any) =>
 	Joi.object({
 		startBid: Joi.number().positive().required(),

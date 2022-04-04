@@ -1,6 +1,11 @@
 import Joi from "joi";
 import { ItemCondition } from "../utils";
 
+/**
+ * Validate an auction item
+ * @param data the auction item
+ * @returns error messages if any
+ */
 export const auctionItemValidation = (data: any) =>
 	Joi.object({
 		name: Joi.string().max(256).required(),

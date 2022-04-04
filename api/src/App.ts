@@ -18,6 +18,7 @@ class AuctionApp {
 	private expressInstance = express();
 
 	constructor() {
+		// Add routes and middleware
 		this.useMiddleware(bodyParser.json());
 		this.useRoute("/auth", authRoute.getRouter());
 		this.useRoute("/user", userRoute.getRouter());
@@ -45,7 +46,7 @@ class AuctionApp {
 	}
 
 	/**
-	 * Use router on route
+	 * Use a router on  given route
 	 * @param route
 	 * @param router
 	 */

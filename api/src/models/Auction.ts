@@ -18,6 +18,7 @@ export interface Auction {
 	status: AuctionStatus;
 }
 
+/** mongoose model for auctions */
 export const AuctionModel = model<Auction>(
 	"Auction",
 	new Schema<Auction>(

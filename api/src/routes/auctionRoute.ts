@@ -22,6 +22,7 @@ class AuctionRoute {
 		this.getAuctionRoute();
 		this.createAuctionRoute();
 		this.updateAuctionRoute();
+		this.deleteAuctionRoute();
 
 		this.auctionItemRoutes();
 		this.auctionBidRoutes();
@@ -29,6 +30,7 @@ class AuctionRoute {
 
 	/**
 	 * GET "/:id"
+	 * Find an auction with given id
 	 */
 	private getAuctionRoute() {
 		type ReqParams = { id: Auction["_id"] };
@@ -45,6 +47,7 @@ class AuctionRoute {
 
 	/**
 	 * POST "/"
+	 * Create a new auction
 	 */
 	private createAuctionRoute() {
 		type ReqBody = EntryType<Auction>;
@@ -90,6 +93,7 @@ class AuctionRoute {
 
 	/**
 	 * PATCH "/:id"
+	 * Update an existing auction
 	 */
 	private updateAuctionRoute() {
 		type ReqParams = { id: Auction["_id"] };
@@ -108,7 +112,7 @@ class AuctionRoute {
 						auction.bids.length > 0 &&
 						auction.item !== req.body.item
 					)
-						throw new Error("Bids have been made. Cannot change item now.");
+						throw new Error("Bids have been made. Cannot change auction now.");
 
 					let validationErr = auctionValidation(req.body);
 					if (validationErr) throw new Error(validationErr);
@@ -129,7 +133,40 @@ class AuctionRoute {
 	}
 
 	/**
+	 * DELETE "/:id"
+	 * Update an existing auction
+	 */
+	private deleteAuctionRoute() {
+		type ReqParams = { id: Auction["_id"] };
+
+		this.router.delete<ReqParams>("/", verifyToken, async (req, res) => {
+			try {
+				const user = <User["_id"]>(<unknown>req.headers.user);
+				let auction = await auctionController.getAuction(req.params.id);
+				if (auction) {
+					if (auction.by !== user)
+						throw new Error("Auction not created by user");
+					if (auction.status === AuctionStatus.closed)
+						throw new Error("Auction is closed");
+					if (
+						auction.bids &&
+						auction.bids.length > 0 &&
+						auction.item !== req.body.item
+					)
+						throw new Error("Bids have been made. Cannot delete auction now.");
+
+					auction = await auctionController.deleteAuction(req.params.id);
+					res.status(200).send(auction);
+				} else throw new Error(`Auction ${req.params.id} does not exist`);
+			} catch (error: any) {
+				res.status(400).send({ error: error.message });
+			}
+		});
+	}
+
+	/**
 	 * Use "/:id/bid"
+	 * Attach router for bidding on a given auction
 	 */
 	private auctionBidRoutes() {
 		this.router.use(
@@ -145,6 +182,7 @@ class AuctionRoute {
 
 	/**
 	 * Use "/item"
+	 * Attach router for auction items
 	 */
 	private auctionItemRoutes() {
 		this.router.use("/item", verifyToken, auctionItemRoute.getRouter());

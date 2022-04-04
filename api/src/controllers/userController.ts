@@ -37,7 +37,7 @@ class UserController {
 	}
 
 	/**
-	 * Add auction to auctions field on auction creation
+	 * Add auction to a user's auctions field upon auction creation
 	 * @param userId user id
 	 * @param auctionId auction id
 	 * @returns user

@@ -19,6 +19,7 @@ class AuctionItemRoute {
 
 	/**
 	 * POST "/"
+	 * Create an auction item
 	 */
 	private createAuctionItemRoute() {
 		type ReqBody = EntryType<AuctionItem>;
@@ -48,6 +49,7 @@ class AuctionItemRoute {
 
 	/**
 	 * GET "/:id"
+	 * Find an existing item with a given id
 	 */
 	private getAuctionItemRoute() {
 		type ReqParams = { id: AuctionItem["_id"] };
@@ -66,6 +68,7 @@ class AuctionItemRoute {
 
 	/**
 	 * PATCH "/:id"
+	 * Update an existing item with given id
 	 */
 	private updateAuctionItemRoute() {
 		type ReqParams = { id: AuctionItem["_id"] };

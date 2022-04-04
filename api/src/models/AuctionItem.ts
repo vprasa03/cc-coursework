@@ -11,6 +11,9 @@ export interface AuctionItem {
 	condition: ItemCondition;
 }
 
+/**
+ * mongoose model for auction items
+ */
 export const AuctionItemModel = model<AuctionItem>(
 	"AuctionItem",
 	new Schema<AuctionItem>(

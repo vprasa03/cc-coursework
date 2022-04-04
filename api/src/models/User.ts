@@ -12,6 +12,9 @@ export interface User {
 	entryTime: number;
 }
 
+/**
+ * mongoose model for users
+ */
 export const UserModel = model<User>(
 	"User",
 	new Schema<User>(

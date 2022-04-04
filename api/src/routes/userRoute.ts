@@ -19,6 +19,7 @@ class UserRoute {
 
 	/**
 	 * GET "/:id"
+	 * Find user with given id
 	 */
 	private getUser() {
 		type ReqParams = { id: User["_id"] };
@@ -43,6 +44,7 @@ class UserRoute {
 
 	/**
 	 * PATCH "/"
+	 * Update authenticated user's details
 	 */
 	private updateUser() {
 		type ReqBody = Partial<User>;

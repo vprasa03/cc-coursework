@@ -15,6 +15,7 @@ class AuctionsRoute {
 
 	/**
 	 * GET "/"
+	 * Get paginated list of auctions sorted in descending order by endDate
 	 */
 	private getAuctionsRoute() {
 		type ReqParams = {

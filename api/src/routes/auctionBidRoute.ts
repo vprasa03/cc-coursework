@@ -23,6 +23,7 @@ class AuctionBidRoute {
 
 	/**
 	 * POST "/"
+	 * Make a bid in an auction
 	 */
 	private postBid() {
 		type ReqBody = { amount: Bid["amount"]; forAuction: Auction["_id"] };
