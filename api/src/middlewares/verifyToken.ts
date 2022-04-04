@@ -1,11 +1,11 @@
-import { NextFunction, Response, Request } from "express";
+import { Request, Response, NextFunction } from "express";
 import { verify, JwtPayload } from "jsonwebtoken";
 
-export const verifyToken = (
-	req: Request,
+export function verifyToken<P = {}, Q = {}, B = {}>(
+	req: Request<P, Q, B>,
 	res: Response,
 	next: NextFunction
-) => {
+) {
 	const token = req.header("auth-token");
 	if (token) {
 		try {
@@ -18,4 +18,4 @@ export const verifyToken = (
 			res.status(400).send({ error: error.message });
 		}
 	} else res.status(401).send({ error: "Access denied" });
-};
+}
