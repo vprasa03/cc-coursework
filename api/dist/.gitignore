@@ -1,0 +1,3 @@
+# Ignore all except README
+*
+!README.md
