@@ -5,7 +5,8 @@
 	"scripts": {
 		"start:api": "tsc -p api/src && node api/dist/index.js",
 		"start:jobs": "tsc -p cron-jobs/src && node cron-jobs/dist/index.js",
-		"start:dev": "NODE_ENV=development fbw -t api/src -r 'tsc -p api/src' -t api/dist -r 'node api/dist/index.js'",
+		"dev:api": "NODE_ENV=development fbw -t api/src -r 'tsc -p api/src' -t api/dist -r 'node api/dist/index.js'",
+		"dev:jobs": "NODE_ENV=development fbw -t cron-jobs/src -r 'tsc -p cron-jobs/src' -t cron-jobs/dist -r 'node cron-jobs/dist/index.js'",
 		"build:api": "tsc -p api/src",
 		"build:jobs": "tsc -p cron-jobs/src"
 	},
