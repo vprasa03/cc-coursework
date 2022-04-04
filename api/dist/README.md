@@ -1,1 +1,1 @@
-Destination for typescript compiler output of ../backend/src
+Destination for typescript compiler output of ../api/src
