@@ -3,9 +3,11 @@
 	"version": "2.0.0",
 	"description": "Coursework for cloud computing module 2021-22",
 	"scripts": {
-		"start:app": "tsc -p api/src && node api/dist/index.js",
+		"start:api": "tsc -p api/src && node api/dist/index.js",
+		"start:jobs": "tsc -p cron-jobs/src && node cron-jobs/dist/index.js",
 		"start:dev": "NODE_ENV=development fbw -t api/src -r 'tsc -p api/src' -t api/dist -r 'node api/dist/index.js'",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"build:api": "tsc -p api/src",
+		"build:jobs": "tsc -p cron-jobs/src"
 	},
 	"repository": {
 		"type": "git",
