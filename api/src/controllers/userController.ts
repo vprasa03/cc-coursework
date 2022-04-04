@@ -121,20 +121,6 @@ class UserController {
 			throw error;
 		}
 	}
-
-	/**
-	 * Find and delete user with given id
-	 * @param userId _id of the user to delete
-	 * @returns user
-	 */
-	public async deleteUser(userId: User["_id"]) {
-		try {
-			const user = await this.model.findByIdAndDelete(userId).lean();
-			return user;
-		} catch (error) {
-			throw error;
-		}
-	}
 }
 
 export const userController = new UserController(UserModel);

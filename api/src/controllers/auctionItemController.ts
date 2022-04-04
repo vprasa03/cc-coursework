@@ -72,20 +72,6 @@ class AuctionItemController {
 			throw error;
 		}
 	}
-
-	/**
-	 * Find and delete auction item with given id
-	 * @param itemId _id of the item to delete
-	 * @returns auction item
-	 */
-	public async deleteAuctionItem(itemId: AuctionItem["_id"]) {
-		try {
-			const item = await this.model.findByIdAndDelete(itemId).lean();
-			return item;
-		} catch (error) {
-			throw error;
-		}
-	}
 }
 
 export const auctionItemController = new AuctionItemController(

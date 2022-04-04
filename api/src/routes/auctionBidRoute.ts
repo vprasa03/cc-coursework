@@ -5,8 +5,8 @@ import {
 	bidController,
 	userController,
 } from "../controllers";
-import { Bid, User } from "../models";
-import { EntryType, unixTs } from "../utils";
+import { Auction, Bid, User } from "../models";
+import { AuctionStatus, unixTs } from "../utils";
 import { bidValidation } from "../validations";
 
 /**
@@ -25,7 +25,7 @@ class AuctionBidRoute {
 	 * POST "/"
 	 */
 	private postBid() {
-		type ReqBody = EntryType<Bid>;
+		type ReqBody = { amount: Bid["amount"]; forAuction: Auction["_id"] };
 
 		this.router.post<{}, {}, ReqBody>("/", async (req, res) => {
 			try {
@@ -34,6 +34,8 @@ class AuctionBidRoute {
 
 				const user = <User["_id"]>(<unknown>req.headers.user);
 				const auction = await auctionController.getAuction(req.body.forAuction);
+				if (auction.status !== AuctionStatus.open)
+					throw new Error("Not open for bidding");
 				if (auction.highestBid && auction.highestBid >= req.body.amount) {
 					throw new Error("Insufficient amount");
 				}
@@ -46,7 +48,7 @@ class AuctionBidRoute {
 				});
 
 				await auctionController.addAuctionBid(req.body.forAuction, bid);
-				await userController.addAuctionBid(req.body.byUser, bid._id);
+				await userController.addAuctionBid(user, bid._id);
 				res.status(200).send(bid);
 			} catch (error: any) {
 				res.status(400).send({ error: error.message });

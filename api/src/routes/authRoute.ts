@@ -62,16 +62,16 @@ class AuthRoute {
 				const validationErr = signupValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
 
-				let user = await userController.getUserWithEmail(req.body.email);
+				const user = await userController.getUserWithEmail(req.body.email);
 				if (!user) throw new Error(`${req.body.email} does not exist`);
 
 				const salt = await genSalt(this.saltKey);
 				const hashed = await hash(req.body.password, salt);
 
-				user = <User>await userController.updateUser(user._id, {
+				await userController.updateUser(user._id, {
 					password: hashed,
 				});
-				res.status(200).send(user);
+				res.status(200).send({ success: true });
 			} catch (error: any) {
 				res.status(400).send({ error: error.message });
 			}

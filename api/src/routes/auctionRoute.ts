@@ -3,7 +3,6 @@ import { Router } from "express";
 import {
 	auctionController,
 	auctionItemController,
-	bidController,
 	userController,
 } from "../controllers";
 import { verifyToken } from "../middlewares";
@@ -34,15 +33,10 @@ class AuctionRoute {
 	private getAuctionRoute() {
 		type ReqParams = { id: Auction["_id"] };
 
-		this.router.get<ReqParams>("/:id", async (req, res) => {
+		this.router.get<ReqParams>("/:id", verifyToken, async (req, res) => {
 			try {
 				const auction = await auctionController.getAuction(req.params.id);
-				if (auction?.bids && auction?.bids.length > 0) {
-					const bids = await bidController.getBids(auction.bids);
-					res.status(400).send({ ...auction, bids });
-				} else {
-					res.status(200).send(auction);
-				}
+				res.status(200).send(auction);
 			} catch (error: any) {
 				res.status(400).send({ error: error.message });
 			}
@@ -55,7 +49,7 @@ class AuctionRoute {
 	private createAuctionRoute() {
 		type ReqBody = EntryType<Auction>;
 
-		this.router.post<{}, {}, ReqBody>("/", async (req, res) => {
+		this.router.post<{}, {}, ReqBody>("/", verifyToken, async (req, res) => {
 			try {
 				let validationErr = auctionValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
@@ -98,16 +92,12 @@ class AuctionRoute {
 	 * PATCH "/:id"
 	 */
 	private updateAuctionRoute() {
-		type ReqBody = Partial<Auction>;
 		type ReqParams = { id: Auction["_id"] };
 
-		this.router.patch<ReqParams, {}, ReqBody>("/", async (req, res) => {
+		this.router.patch<ReqParams>("/", verifyToken, async (req, res) => {
 			try {
 				const user = <User["_id"]>(<unknown>req.headers.user);
-				let auction = <Auction>(
-					await auctionController.getAuction(req.params.id)
-				);
-
+				let auction = await auctionController.getAuction(req.params.id);
 				if (auction) {
 					if (auction.by !== user)
 						throw new Error("Auction not created by user");
@@ -129,10 +119,8 @@ class AuctionRoute {
 						);
 					if (validationErr) throw new Error(validationErr);
 
-					auction = <Auction>(
-						await auctionController.updateAuction(req.params.id, req.body)
-					);
-					res.status(200).send(auction);
+					await auctionController.updateAuction(req.params.id, req.body);
+					res.status(200).send({ ...auction, ...req.body });
 				} else throw new Error(`Auction ${req.params.id} does not exist`);
 			} catch (error: any) {
 				res.status(400).send({ error: error.message });
