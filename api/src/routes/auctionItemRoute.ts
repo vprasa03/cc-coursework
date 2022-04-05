@@ -1,8 +1,8 @@
 import { Router } from "express";
 
-import { auctionItemController } from "../controllers";
+import { auctionController, auctionItemController } from "../controllers";
 import { AuctionItem } from "../models";
-import { EntryType, unixTs } from "../utils";
+import { AuctionStatus, EntryType, unixTs } from "../utils";
 import { auctionItemValidation } from "../validations";
 
 /**
@@ -79,6 +79,12 @@ class AuctionItemRoute {
 				const user = <string>req.headers.user;
 				const validationErr = auctionItemValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
+
+				const auctionExists = await auctionController.getActiveAuctionByItem(
+					req.params.id
+				);
+				if (auctionExists && auctionExists.status !== AuctionStatus.entry)
+					throw new Error(`Active auction exists for ${req.params.id}`);
 
 				let auctionItem = await auctionItemController.getAuctionItem(
 					req.params.id
