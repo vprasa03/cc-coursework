@@ -1,7 +1,7 @@
 import { Model } from "mongoose";
 
 import { EntryType } from "../utils";
-import { Auction, AuctionModel, Bid, User } from "../models";
+import { Auction, AuctionItem, AuctionModel, Bid, User } from "../models";
 
 class AuctionController {
 	constructor(private model: Model<Auction>) {}
@@ -60,7 +60,7 @@ class AuctionController {
 			const auction = await this.model
 				.findByIdAndUpdate(id, {
 					$push: { bids: bid._id },
-					$set: { highestBid: bid.amount },
+					$set: { highestBid: bid._id },
 				})
 				.lean();
 			return <Auction>auction;
@@ -96,6 +96,20 @@ class AuctionController {
 	public async getAuction(auctionId: Auction["_id"]) {
 		try {
 			const auction = await this.model.findById(auctionId).lean();
+			return <Auction>auction;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
+	 * Find auction with given item
+	 * @param itemId _id of the item in the auction
+	 * @returns auction
+	 */
+	public async getAuctionByItem(itemId: AuctionItem["_id"]) {
+		try {
+			const auction = await this.model.findOne({ item: itemId }).lean();
 			return <Auction>auction;
 		} catch (error) {
 			throw error;
