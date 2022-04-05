@@ -1,6 +1,6 @@
-// import { auctionController } from "./controllers";
-// import { today } from "./utils";
+import { auctionController } from "./controllers";
+import { today } from "./utils";
 
 export const closeAuctions = () => {
-	// auctionController.setClosedStatus(today());
+	auctionController.setClosedStatus(today());
 };
