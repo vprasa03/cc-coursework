@@ -2,6 +2,8 @@ import { connect } from "mongoose";
 import dotenv = require("dotenv");
 import cron = require("node-cron");
 import { isNativeError } from "util/types";
+import { closeAuctions } from "./closeAuctions";
+import { openAuctions } from "./openAuctions";
 
 const envVars = dotenv.config();
 
@@ -9,11 +11,10 @@ const envVars = dotenv.config();
  * Initialise cron jobs on successful connect to MongoDB
  */
 function onDBConnect() {
-	let i = 0;
-
-	cron.schedule("* * * * * *", () => {
-		console.log(i++);
-	});
+	// Close auctions at 23:59 daily
+	cron.schedule("59 23 * * *", closeAuctions);
+	// Open auctions at 00:00 daily
+	cron.schedule("0 0 * * *", openAuctions);
 }
 
 const dbUrl = envVars.parsed?.MURL; // Get MongoDB url
