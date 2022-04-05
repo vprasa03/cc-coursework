@@ -35,8 +35,12 @@ class AuctionBidRoute {
 
 				const user = <string>req.headers.user;
 				const auction = await auctionController.getAuction(req.body.forAuction);
-				if (auction.status !== AuctionStatus.open)
+				if (!auction) throw new Error("Auction does not exist");
+				if (auction?.status !== AuctionStatus.open)
 					throw new Error("Not open for bidding");
+				if (req.body.amount < auction.startBid)
+					throw new Error("Insufficient amount");
+
 				if (auction.highestBid) {
 					const highestBid = await bidController.getBids([auction.highestBid]);
 					if (req.body.amount <= highestBid[0]?.amount)
