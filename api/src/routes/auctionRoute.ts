@@ -65,7 +65,7 @@ class AuctionRoute {
 				const item = await auctionItemController.getAuctionItem(req.body.item);
 				if (!item?.ownedBy.equals(user))
 					throw new Error(`User ${user} does not own item ${req.body.item}`);
-				const auctionExists = await auctionController.getAuctionByItem(
+				const auctionExists = await auctionController.getActiveAuctionByItem(
 					req.body.item
 				);
 				if (auctionExists && auctionExists.status !== AuctionStatus.closed)

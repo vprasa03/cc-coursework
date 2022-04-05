@@ -7,7 +7,7 @@ class AuctionItemController {
 	constructor(private model: Model<AuctionItem>) {}
 
 	/**
-	 * Create new auctin item with given data
+	 * Create new auction item with given data
 	 * @param data auction item data
 	 * @returns new auction item
 	 */
@@ -57,7 +57,7 @@ class AuctionItemController {
 
 	/**
 	 * Find and update auction item with given id
-	 * @param itemId _id of the item to delete
+	 * @param itemId _id of the item to update
 	 * @param data
 	 * @returns auction item
 	 */

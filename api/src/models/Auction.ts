@@ -14,7 +14,7 @@ export interface Auction {
 	highestBid?: Bid["_id"];
 	startDate: string;
 	endDate: string;
-	winner?: Bid["_id"];
+	winner?: Bid["byUser"];
 	status: AuctionStatus;
 }
 

@@ -1,6 +1,6 @@
 import { Model } from "mongoose";
 
-import { EntryType } from "../utils";
+import { AuctionStatus, EntryType } from "../utils";
 import { Auction, AuctionItem, AuctionModel, Bid, User } from "../models";
 
 class AuctionController {
@@ -107,9 +107,14 @@ class AuctionController {
 	 * @param itemId _id of the item in the auction
 	 * @returns auction
 	 */
-	public async getAuctionByItem(itemId: AuctionItem["_id"]) {
+	public async getActiveAuctionByItem(itemId: AuctionItem["_id"]) {
 		try {
-			const auction = await this.model.findOne({ item: itemId }).lean();
+			const auction = await this.model
+				.findOne({
+					item: itemId,
+					status: { $ne: AuctionStatus.closed },
+				})
+				.lean();
 			return <Auction>auction;
 		} catch (error) {
 			throw error;
