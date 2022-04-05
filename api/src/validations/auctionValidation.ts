@@ -22,12 +22,19 @@ const invalidMsg = (key1: string, key2: string, val: number) =>
 	`${val} is invalid ${key2} for ${key1}`;
 
 /**
+ * Get error message for past dates
+ * @param key startDate OR endDate
+ * @returns formatted error message
+ */
+const pastErrMsg = (key: string) => `${key} cannot be in the past`;
+
+/**
  * Custom validator for checking startDate and endDate
  * @param key startDate OR endDate
  * @returns the date unless an error is thrown
  */
 const customDateValidator = (key: string) => (dateString: string) => {
-	const [d, m, y] = dateString.split("-").map(parseInt);
+	const [d, m, y] = dateString.split("-").map((i) => parseInt(i));
 	if (
 		dateString.length !== 10 ||
 		d === undefined ||
@@ -37,11 +44,19 @@ const customDateValidator = (key: string) => (dateString: string) => {
 		throw new Error(dateFormatErrMsg(key, dateFormat));
 
 	const date = new Date();
-	if (y < date.getFullYear() || y > 9999)
-		throw new Error(invalidMsg(key, "year", y));
+	if (
+		!(
+			y >= date.getFullYear() &&
+			m - 1 >= date.getMonth() &&
+			d >= date.getDate()
+		)
+	)
+		throw new Error(pastErrMsg(key));
 	date.setFullYear(y);
 	date.setMonth(m - 1);
-	if (m - 1 !== date.getMonth()) throw new Error(invalidMsg(key, "month", m));
+	if (m - 1 !== date.getMonth()) {
+		throw new Error(invalidMsg(key, "month", m));
+	}
 	date.setDate(d);
 	if (d !== date.getDate())
 		throw new Error(invalidMsg(`month ${m} of ${key}`, "date", d));
