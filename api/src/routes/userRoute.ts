@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { Types } from "mongoose";
 import { userController } from "../controllers";
 import { verifyToken } from "../middlewares";
 import { User } from "../models";
@@ -54,7 +55,7 @@ class UserRoute {
 				const validationErr = userValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
 
-				const userId = <User["_id"]>(<unknown>req.headers.user);
+				const userId = new Types.ObjectId(<string>req.headers.user);
 				const user = await userController.getUser(userId);
 				if (user) {
 					await userController.updateUser(userId, req.body);

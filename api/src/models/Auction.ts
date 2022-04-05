@@ -11,7 +11,7 @@ export interface Auction {
 	item: AuctionItem["_id"];
 	bids?: Bid["byUser"][];
 	startBid: number;
-	highestBid?: number;
+	highestBid?: Bid["_id"];
 	startDate: string;
 	endDate: string;
 	winner?: Bid["byUser"];
@@ -28,7 +28,7 @@ export const AuctionModel = model<Auction>(
 			item: { type: Schema.Types.ObjectId, required: true },
 			bids: { type: [Schema.Types.ObjectId] },
 			startBid: { type: Number, required: true },
-			highestBid: { type: Number },
+			highestBid: { type: Schema.Types.ObjectId },
 			startDate: { type: String, required: true, maxlength: 10 },
 			endDate: { type: String, required: true, maxlength: 10 },
 			winner: { type: Schema.Types.ObjectId },

@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { auctionItemController } from "../controllers";
-import { AuctionItem, User } from "../models";
+import { AuctionItem } from "../models";
 import { EntryType, unixTs } from "../utils";
 import { auctionItemValidation } from "../validations";
 
@@ -26,12 +26,12 @@ class AuctionItemRoute {
 
 		this.router.post<{}, {}, ReqBody>("/", async (req, res) => {
 			try {
-				const user = <User["_id"]>(<unknown>req.headers.user);
+				const user = <string>req.headers.user;
 				const validationErr = auctionItemValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
 
 				const auctionItem = await auctionItemController.createAuctionItem({
-					createTime: unixTs(),
+					entryTime: unixTs(),
 					ownedBy: user,
 					name: req.body.name,
 					details: req.body.details,
@@ -76,7 +76,7 @@ class AuctionItemRoute {
 
 		this.router.patch<ReqParams, {}, ReqBody>("/:id", async (req, res) => {
 			try {
-				const user = <User["_id"]>(<unknown>req.headers.user);
+				const user = <string>req.headers.user;
 				const validationErr = auctionItemValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
 
@@ -84,7 +84,7 @@ class AuctionItemRoute {
 					req.params.id
 				);
 				if (auctionItem) {
-					if (auctionItem.ownedBy !== user)
+					if (!auctionItem.ownedBy.equals(user))
 						throw new Error(`${user} does not own item ${req.params.id}`);
 					await auctionItemController.updateAuctionItem(
 						req.params.id,

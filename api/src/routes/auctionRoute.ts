@@ -1,12 +1,11 @@
 import { Router } from "express";
-
 import {
 	auctionController,
 	auctionItemController,
 	userController,
 } from "../controllers";
 import { verifyToken } from "../middlewares";
-import { Auction, User } from "../models";
+import { Auction } from "../models";
 import { AuctionStatus, EntryType, isToday, unixTs } from "../utils";
 import { auctionValidation, dateCompareValidation } from "../validations";
 import { auctionBidRoute } from "./auctionBidRoute";
@@ -62,21 +61,20 @@ class AuctionRoute {
 				);
 				if (validationErr) throw new Error(validationErr);
 
-				const user = <User["_id"]>(<unknown>req.headers.user);
-				if (
-					user !==
-					(await auctionItemController.getAuctionItem(req.body.item))?.ownedBy
-				)
-					throw new Error(
-						`User ${req.body.by} does not own item ${req.body.item}`
-					);
-
+				const user = <string>req.headers.user;
+				const item = await auctionItemController.getAuctionItem(req.body.item);
+				if (!item?.ownedBy.equals(user))
+					throw new Error(`User ${user} does not own item ${req.body.item}`);
+				const auctionExists = await auctionController.getAuctionByItem(
+					req.body.item
+				);
+				if (auctionExists && auctionExists.status !== AuctionStatus.closed)
+					throw new Error(`Another active auction exists for ${req.body.item}`);
 				const auction = await auctionController.createAuction({
-					createTime: unixTs(),
+					entryTime: unixTs(),
 					by: user,
 					item: req.body.item,
 					startBid: req.body.startBid,
-					highestBid: -1,
 					startDate: req.body.startDate,
 					endDate: req.body.endDate,
 					status: isToday(req.body.startDate)
@@ -100,10 +98,10 @@ class AuctionRoute {
 
 		this.router.patch<ReqParams>("/", verifyToken, async (req, res) => {
 			try {
-				const user = <User["_id"]>(<unknown>req.headers.user);
+				const user = <string>req.headers.user;
 				let auction = await auctionController.getAuction(req.params.id);
 				if (auction) {
-					if (auction.by !== user)
+					if (!auction.by.equals(user))
 						throw new Error("Auction not created by user");
 					if (auction.status === AuctionStatus.closed)
 						throw new Error("Auction is closed");
@@ -141,10 +139,10 @@ class AuctionRoute {
 
 		this.router.delete<ReqParams>("/", verifyToken, async (req, res) => {
 			try {
-				const user = <User["_id"]>(<unknown>req.headers.user);
+				const user = <string>req.headers.user;
 				let auction = await auctionController.getAuction(req.params.id);
 				if (auction) {
-					if (auction.by !== user)
+					if (!auction.by.equals(user))
 						throw new Error("Auction not created by user");
 					if (auction.status === AuctionStatus.closed)
 						throw new Error("Auction is closed");
