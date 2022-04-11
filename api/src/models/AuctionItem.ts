@@ -2,14 +2,18 @@ import { Schema, model, Types } from "mongoose";
 import { ItemCondition } from "../utils";
 import { User } from "./User";
 
-export interface AuctionItem {
+interface AuctionItemBase {
 	_id: Types.ObjectId;
 	entryTime: number;
-	ownedBy: User["_id"];
 	details: string;
 	name: string;
 	condition: ItemCondition;
 }
+export interface AuctionItem extends AuctionItemBase {
+	ownedBy: User["_id"];
+}
+
+export type AuctionItemReqBody = Omit<AuctionItemBase, "_id" | "entryTime">;
 
 /**
  * mongoose model for auction items

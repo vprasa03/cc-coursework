@@ -2,8 +2,8 @@ import { Router } from "express";
 import { genSalt, hash, compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 
-import { EntryType, unixTs } from "../utils";
-import { User } from "../models";
+import { unixTs } from "../utils";
+import { UserReqBody } from "../models";
 import { signupValidation } from "../validations";
 import { userController } from "../controllers";
 
@@ -27,7 +27,7 @@ class AuthRoute {
 	 * Signup for new users
 	 */
 	private postSignup() {
-		type ReqBody = EntryType<User>;
+		type ReqBody = UserReqBody;
 
 		this.router.post<{}, {}, ReqBody>("/signup", async (req, res) => {
 			try {
@@ -57,7 +57,7 @@ class AuthRoute {
 	 * Password reset for existing users
 	 */
 	private postResetPass() {
-		type ReqBody = EntryType<User>;
+		type ReqBody = UserReqBody;
 
 		this.router.post<{}, {}, ReqBody>("/reset-pass", async (req, res) => {
 			try {
@@ -85,7 +85,7 @@ class AuthRoute {
 	 * Login for existing users
 	 */
 	private postLogin() {
-		type ReqBody = EntryType<User>;
+		type ReqBody = UserReqBody;
 
 		this.router.post<{}, {}, ReqBody>("/login", async (req, res) => {
 			try {

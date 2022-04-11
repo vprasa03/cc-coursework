@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { AuctionItemReqBody } from "../models";
 import { ItemCondition } from "../utils";
 
 /**
@@ -6,7 +7,7 @@ import { ItemCondition } from "../utils";
  * @param data the auction item
  * @returns error messages if any
  */
-export const auctionItemValidation = (data: any) =>
+export const auctionItemValidation = (data: AuctionItemReqBody) =>
 	Joi.object({
 		name: Joi.string().max(256).required(),
 		details: Joi.string().max(1024).required(),

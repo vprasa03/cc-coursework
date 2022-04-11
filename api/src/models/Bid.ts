@@ -10,6 +10,8 @@ export interface Bid {
 	entryTime: number;
 }
 
+export type BidReqBody = Pick<Bid, "amount">;
+
 /**
  * mongoose model for bids
  */

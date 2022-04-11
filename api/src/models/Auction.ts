@@ -4,18 +4,32 @@ import { AuctionItem } from "./AuctionItem";
 import { Bid } from "./Bid";
 import { User } from "./User";
 
-export interface Auction {
+interface AuctionBase {
 	_id: Types.ObjectId;
-	entryTime: number;
 	by: User["_id"];
-	item: AuctionItem["_id"];
-	bids?: Bid["byUser"][];
+	entryTime: number;
 	startBid: number;
-	highestBid?: Bid["_id"];
 	startDate: string;
 	endDate: string;
 	winner?: Bid["byUser"];
 	status: AuctionStatus;
+}
+
+export interface AuctionReqBody
+	extends Pick<AuctionBase, "startBid" | "startDate" | "endDate"> {
+	item: string;
+}
+
+export interface Auction extends AuctionBase {
+	item: AuctionItem["_id"];
+	bids?: Bid["byUser"][];
+	highestBid?: Bid["_id"];
+}
+
+export interface AuctionExpanded extends AuctionBase {
+	item: AuctionItem;
+	bids?: Bid[];
+	highestBid?: Bid[];
 }
 
 /** mongoose model for auctions */

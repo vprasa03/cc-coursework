@@ -1,7 +1,6 @@
-import { Model } from "mongoose";
+import { Model /*, PipelineStage */ } from "mongoose";
 
-import { EntryType } from "../utils";
-import { Auction, Bid, User, UserModel } from "../models";
+import { Auction, Bid, User, UserModel, UserReqBody } from "../models";
 
 class UserController {
 	constructor(private model: Model<User>) {}
@@ -11,9 +10,9 @@ class UserController {
 	 * @param data new user data
 	 * @returns new user
 	 */
-	public async createUser<T = EntryType<User>>(data: T) {
+	public async createUser(data: Omit<User, "_id">) {
 		try {
-			const user = new this.model<T>(data);
+			const user = new this.model(data);
 			await user.save();
 			return user.toObject();
 		} catch (error) {
@@ -27,7 +26,7 @@ class UserController {
 	 * @param data updated user data
 	 * @returns user
 	 */
-	public async updateUser(userId: User["_id"], data: Partial<User>) {
+	public async updateUser(userId: User["_id"], data: Partial<UserReqBody>) {
 		try {
 			const user = await this.model.findByIdAndUpdate(userId, data).lean();
 			return user;
@@ -107,20 +106,20 @@ class UserController {
 	 * @param userIds _ids of the users to find
 	 * @returns users
 	 */
-	public async getUsers(userIds: User["_id"][]) {
-		try {
-			const users = await this.model
-				.find({
-					_id: {
-						$in: userIds,
-					},
-				})
-				.lean();
-			return users;
-		} catch (error) {
-			throw error;
-		}
-	}
+	// 	private async findUsers(params: PipelineStage.Match) {
+	// 		try {
+	// 			const users = await this.model
+	// 				.find({
+	// 					_id: {
+	// 						$in: userIds,
+	// 					},
+	// 				})
+	// 				.lean();
+	// 			return users;
+	// 		} catch (error) {
+	// 			throw error;
+	// 		}
+	// 	}
 }
 
 export const userController = new UserController(UserModel);

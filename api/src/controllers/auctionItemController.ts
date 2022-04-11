@@ -1,7 +1,6 @@
 import { Model } from "mongoose";
 
 import { AuctionItem, AuctionItemModel } from "../models";
-import { EntryType } from "../utils";
 
 class AuctionItemController {
 	constructor(private model: Model<AuctionItem>) {}
@@ -11,9 +10,9 @@ class AuctionItemController {
 	 * @param data auction item data
 	 * @returns new auction item
 	 */
-	public async createAuctionItem<T = EntryType<AuctionItem>>(data: T) {
+	public async createAuctionItem(data: Omit<AuctionItem, "_id">) {
 		try {
-			const auctionItem = new this.model<T>(data);
+			const auctionItem = new this.model(data);
 			await auctionItem.save();
 			return auctionItem.toObject();
 		} catch (error) {

@@ -1,6 +1,5 @@
 import { Model } from "mongoose";
 
-import { EntryType } from "../utils";
 import { Bid, BidModel } from "../models";
 
 class BidController {
@@ -11,9 +10,9 @@ class BidController {
 	 * @param data new bid
 	 * @returns new bid
 	 */
-	public async createBid<T = EntryType<Bid>>(data: T) {
+	public async createBid(data: Omit<Bid, "_id">) {
 		try {
-			const bid = new this.model<T>(data);
+			const bid = new this.model(data);
 			await bid.save();
 			return bid.toObject();
 		} catch (error) {

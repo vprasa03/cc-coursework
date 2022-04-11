@@ -29,7 +29,7 @@ class AuctionsRoute {
 			async (req, res) => {
 				try {
 					const page = parseInt(req.params.page) || 0;
-					const limit = parseInt(req.params.limit) || 0;
+					const limit = parseInt(req.params.limit) || 1000;
 
 					res
 						.status(200)

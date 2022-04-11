@@ -2,14 +2,25 @@ import { Schema, model, Types } from "mongoose";
 import { Auction } from "./Auction";
 import { Bid } from "./Bid";
 
-export interface User {
-	_id: Types.ObjectId;
+export interface UserReqBody {
 	email: string;
 	name?: string;
 	password: string;
+}
+
+interface UserBase extends UserReqBody {
+	_id: Types.ObjectId;
+	entryTime: number;
+}
+
+export interface User extends UserBase {
 	auctions?: Auction["_id"][];
 	bids?: Bid["_id"][];
-	entryTime: number;
+}
+
+export interface UserExpanded extends UserBase {
+	auctions?: Auction[];
+	bids?: Bid[];
 }
 
 /**

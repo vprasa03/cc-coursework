@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { AuctionReqBody } from "../models";
 
 const dateFormat = "DD-MM-YYYY"; // The accepted date format
 
@@ -69,7 +70,7 @@ const customDateValidator = (key: string) => (dateString: string) => {
  * @param data the auction
  * @returns error messages if any
  */
-export const auctionValidation = (data: any) =>
+export const auctionValidation = (data: AuctionReqBody) =>
 	Joi.object({
 		startBid: Joi.number().positive().required(),
 		startDate: Joi.string().custom(customDateValidator("startDate")).required(),

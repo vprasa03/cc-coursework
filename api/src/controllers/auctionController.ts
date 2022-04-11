@@ -1,7 +1,13 @@
-import { Model } from "mongoose";
-
-import { AuctionStatus, EntryType } from "../utils";
-import { Auction, AuctionItem, AuctionModel, Bid, User } from "../models";
+import { Model, PipelineStage } from "mongoose";
+import { AuctionStatus } from "../utils";
+import {
+	Auction,
+	AuctionExpanded,
+	AuctionItem,
+	AuctionModel,
+	Bid,
+	User,
+} from "../models";
 
 class AuctionController {
 	constructor(private model: Model<Auction>) {}
@@ -11,9 +17,9 @@ class AuctionController {
 	 * @param data new auction data
 	 * @returns new auction
 	 */
-	public async createAuction<T = EntryType<Auction>>(data: T) {
+	public async createAuction(data: Omit<Auction, "_id">) {
 		try {
-			const auction = new this.model<T>(data);
+			const auction = new this.model(data);
 			await auction.save();
 			return <Auction>auction.toObject();
 		} catch (error) {
@@ -89,14 +95,85 @@ class AuctionController {
 	}
 
 	/**
+	 * Find auction(s) with given params
+	 * @param params Match parameters for the auction(s) to find
+	 * @returns AuctionExpanded[]
+	 */
+	private async findAuction(
+		params: PipelineStage.Match,
+		page: number = 0,
+		limit: number = 1000
+	) {
+		try {
+			const auction = await this.model.aggregate<AuctionExpanded>([
+				params,
+				{
+					$unwind: { path: "$bids", preserveNullAndEmptyArrays: true },
+				},
+				{
+					$lookup: {
+						from: "Bid",
+						localField: "bids",
+						foreignField: "_id",
+						as: "bids",
+					},
+				},
+				{
+					$group: {
+						_id: "$_id",
+						by: { $first: "$by" },
+						entryTime: { $first: "$entryTime" },
+						item: { $first: "$item" },
+						startBid: { $first: "$startBid" },
+						startDate: { $first: "$startDate" },
+						endDate: { $first: "$endDate" },
+						status: { $first: "$status" },
+						highestBid: { $first: "$highestBid" },
+						bids: { $push: "$bids" },
+					},
+				},
+				{
+					$lookup: {
+						from: "Bid",
+						localField: "highestBid",
+						foreignField: "_id",
+						as: "highestBid",
+					},
+				},
+				{
+					$lookup: {
+						from: "AuctionItem",
+						localField: "item",
+						foreignField: "_id",
+						as: "item",
+					},
+				},
+				{
+					$sort: { endDate: -1 },
+				},
+				{
+					$skip: page > 0 ? (page - 1) * limit : 0,
+				},
+				{
+					$limit: limit,
+				},
+			]);
+			return auction;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	/**
 	 * Find auction with given id
 	 * @param auctionId _id of the auction to find
-	 * @returns auction
+	 * @returns AuctionExpanded[]
 	 */
 	public async getAuction(auctionId: Auction["_id"]) {
 		try {
-			const auction = await this.model.findById(auctionId).lean();
-			return <Auction>auction;
+			return await this.findAuction({
+				$match: { _id: auctionId },
+			});
 		} catch (error) {
 			throw error;
 		}
@@ -105,17 +182,16 @@ class AuctionController {
 	/**
 	 * Find auction with given item
 	 * @param itemId _id of the item in the auction
-	 * @returns auction
+	 * @returns AuctionExpanded[]
 	 */
 	public async getActiveAuctionByItem(itemId: AuctionItem["_id"]) {
 		try {
-			const auction = await this.model
-				.findOne({
+			return await this.findAuction({
+				$match: {
 					item: itemId,
 					status: { $ne: AuctionStatus.closed },
-				})
-				.lean();
-			return <Auction>auction;
+				},
+			});
 		} catch (error) {
 			throw error;
 		}
@@ -129,13 +205,13 @@ class AuctionController {
 	 */
 	public async getAuctions(page: number, limit: number) {
 		try {
-			const auctions = await this.model
-				.find()
-				.sort({ endDate: -1 })
-				.skip(page > 0 ? (page - 1) * limit : 0)
-				.limit(limit)
-				.lean();
-			return <Auction[]>auctions;
+			return await this.findAuction(
+				{
+					$match: {},
+				},
+				page,
+				limit
+			);
 		} catch (error) {
 			throw error;
 		}
@@ -149,7 +225,7 @@ class AuctionController {
 	public async deleteAuction(auctionId: Auction["_id"]) {
 		try {
 			const auction = await this.model.findByIdAndDelete(auctionId).lean();
-			return <Auction>auction;
+			return auction as Auction;
 		} catch (error) {
 			throw error;
 		}
