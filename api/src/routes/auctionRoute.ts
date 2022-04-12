@@ -61,20 +61,20 @@ class AuctionRoute {
 				if (validationErr) throw new Error(validationErr);
 
 				const user = new Types.ObjectId(req.headers.user as string);
-				const auctionExists = await auctionController.getActiveAuctionByItem(
+				const result = await auctionController.getActiveAuctionByItem(
 					new Types.ObjectId(req.body.item)
 				);
-				if (
-					auctionExists.length > 0 &&
-					!auctionExists[0].item.ownedBy.equals(user)
-				)
-					throw new Error(`User ${user} does not own item ${req.body.item}`);
 
-				if (
-					auctionExists.length > 0 &&
-					auctionExists[0].status !== AuctionStatus.closed
-				)
-					throw new Error(`Another active auction exists for ${req.body.item}`);
+				if (result.length > 0) {
+					const auction = result[0];
+					if (!user.equals(auction.item[0].ownedBy))
+						throw new Error(`User ${user} does not own item ${req.body.item}`);
+
+					if (auction.status !== AuctionStatus.closed)
+						throw new Error(
+							`Another active auction exists for ${req.body.item}`
+						);
+				}
 
 				const auction = await auctionController.createAuction({
 					entryTime: unixTs(),
@@ -116,7 +116,7 @@ class AuctionRoute {
 					if (
 						auction[0].bids &&
 						auction[0].bids.length > 0 &&
-						auction[0].item._id.equals(req.body.item)
+						auction[0].item[0]._id.equals(req.body.item)
 					)
 						throw new Error("Bids have been made. Cannot change auction now.");
 
@@ -162,7 +162,7 @@ class AuctionRoute {
 					if (
 						auction[0].bids &&
 						auction[0].bids.length > 0 &&
-						auction[0].item._id.equals(req.body.item)
+						auction[0].item[0]._id.equals(req.body.item)
 					)
 						throw new Error("Bids have been made. Cannot delete auction now.");
 

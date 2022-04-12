@@ -27,7 +27,7 @@ export interface Auction extends AuctionBase {
 }
 
 export interface AuctionExpanded extends AuctionBase {
-	item: AuctionItem;
+	item: AuctionItem[];
 	bids?: Bid[];
 	highestBid?: Bid[];
 }

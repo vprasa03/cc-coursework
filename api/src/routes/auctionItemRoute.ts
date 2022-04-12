@@ -73,7 +73,7 @@ class AuctionItemRoute {
 
 		this.router.patch<ReqParams, {}, ReqBody>("/:id", async (req, res) => {
 			try {
-				const user = req.headers.user as string;
+				const user = new Types.ObjectId(req.headers.user as string);
 				const validationErr = auctionItemValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
 
@@ -86,7 +86,7 @@ class AuctionItemRoute {
 
 					if (auction.status !== AuctionStatus.entry)
 						throw new Error(`Active auction exists for ${req.params.id}`);
-					if (!auction.item.ownedBy.equals(user))
+					if (!user.equals(auction.item[0].ownedBy))
 						throw new Error(`${user} does not own item ${req.params.id}`);
 					await auctionItemController.updateAuctionItem(
 						new Types.ObjectId(req.params.id),
