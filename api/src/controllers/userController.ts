@@ -1,6 +1,14 @@
+import { PipelineStage } from "mongoose";
 import { Model /*, PipelineStage */ } from "mongoose";
 
-import { Auction, Bid, User, UserModel, UserReqBody } from "../models";
+import {
+	Auction,
+	Bid,
+	User,
+	UserExpanded,
+	UserModel,
+	UserReqBody,
+} from "../models";
 
 class UserController {
 	constructor(private model: Model<User>) {}
@@ -45,7 +53,7 @@ class UserController {
 		try {
 			const user = await this.model
 				.findByIdAndUpdate(userId, {
-					$addToSet: { hosted: auctionId },
+					$addToSet: { auctions: auctionId },
 				})
 				.lean();
 			return user;
@@ -80,8 +88,9 @@ class UserController {
 	 */
 	public async getUser(userId: User["_id"]) {
 		try {
-			const user = await this.model.findById(userId).lean();
-			return user;
+			return await this.findUser({
+				$match: { _id: userId },
+			});
 		} catch (error) {
 			throw error;
 		}
@@ -94,32 +103,73 @@ class UserController {
 	 */
 	public async getUserWithEmail(email: User["email"]) {
 		try {
-			const user = await this.model.findOne({ email }).lean();
-			return user;
+			return await this.findUser({
+				$match: { email: email },
+			});
 		} catch (error) {
 			throw error;
 		}
 	}
 
 	/**
-	 * Find users with given ids
-	 * @param userIds _ids of the users to find
-	 * @returns users
+	 * Find user(s) with given params
+	 * @param params Match parameters for the user(s) to find
+	 * @returns UserExpanded[]
 	 */
-	// 	private async findUsers(params: PipelineStage.Match) {
-	// 		try {
-	// 			const users = await this.model
-	// 				.find({
-	// 					_id: {
-	// 						$in: userIds,
-	// 					},
-	// 				})
-	// 				.lean();
-	// 			return users;
-	// 		} catch (error) {
-	// 			throw error;
-	// 		}
-	// 	}
+	private async findUser(params: PipelineStage.Match) {
+		try {
+			const auction = await this.model.aggregate<UserExpanded>([
+				params,
+				{
+					$unwind: { path: "$bids", preserveNullAndEmptyArrays: true },
+				},
+				{
+					$lookup: {
+						from: "Bid",
+						localField: "bids",
+						foreignField: "_id",
+						as: "bids",
+					},
+				},
+				{
+					$group: {
+						_id: "$_id",
+						email: { $first: "$email" },
+						name: { $first: "$name" },
+						entryTime: { $first: "$entryTime" },
+						auctions: { $first: "$auctions" },
+						bids: { $push: "$bids" },
+						password: { $first: "$password" },
+					},
+				},
+				{
+					$unwind: { path: "$auctions", preserveNullAndEmptyArrays: true },
+				},
+				{
+					$lookup: {
+						from: "Auction",
+						localField: "auctions",
+						foreignField: "_id",
+						as: "auctions",
+					},
+				},
+				{
+					$group: {
+						_id: "$_id",
+						email: { $first: "$email" },
+						name: { $first: "$name" },
+						entryTime: { $first: "$entryTime" },
+						auctions: { $push: "$auctions" },
+						bids: { $first: "$bids" },
+						password: { $first: "$password" },
+					},
+				},
+			]);
+			return auction;
+		} catch (error) {
+			throw error;
+		}
+	}
 }
 
 export const userController = new UserController(UserModel);
