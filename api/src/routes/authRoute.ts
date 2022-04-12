@@ -4,7 +4,7 @@ import { sign } from "jsonwebtoken";
 
 import { unixTs } from "../utils";
 import { UserReqBody } from "../models";
-import { signupValidation } from "../validations";
+import { loginValidation, signupValidation } from "../validations";
 import { userController } from "../controllers";
 
 /**
@@ -34,7 +34,8 @@ class AuthRoute {
 				const validationErr = signupValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
 
-				if (await userController.getUserWithEmail(req.body.email))
+				const result = await userController.getUserWithEmail(req.body.email);
+				if (result.length > 0)
 					throw new Error(`${req.body.email} already exists`);
 
 				const salt = await genSalt(this.saltKey);
@@ -45,7 +46,11 @@ class AuthRoute {
 					password: hashed,
 					entryTime: unixTs(),
 				});
-				res.status(200).send(user);
+				res.status(200).send({
+					_id: user._id,
+					email: user.email,
+					name: user.name,
+				});
 			} catch (error: any) {
 				res.status(400).send({ error: error.message });
 			}
@@ -64,9 +69,11 @@ class AuthRoute {
 				const validationErr = signupValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
 
-				const user = await userController.getUserWithEmail(req.body.email);
-				if (!user) throw new Error(`${req.body.email} does not exist`);
+				const result = await userController.getUserWithEmail(req.body.email);
+				if (result.length === 0)
+					throw new Error(`${req.body.email} does not exist`);
 
+				const user = result[0];
 				const salt = await genSalt(this.saltKey);
 				const hashed = await hash(req.body.password, salt);
 
@@ -89,12 +96,14 @@ class AuthRoute {
 
 		this.router.post<{}, {}, ReqBody>("/login", async (req, res) => {
 			try {
-				const validationErr = signupValidation(req.body);
+				const validationErr = loginValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
 
-				const user = await userController.getUserWithEmail(req.body.email);
-				if (!user) throw new Error(`${req.body.email} does not exist`);
+				const result = await userController.getUserWithEmail(req.body.email);
+				if (result.length === 0)
+					throw new Error(`${req.body.email} does not exist`);
 
+				const user = result[0];
 				const passwordValid = await compare(req.body.password, user.password);
 				if (!passwordValid) throw new Error("Password is wrong");
 

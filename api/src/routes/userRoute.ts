@@ -15,6 +15,7 @@ class UserRoute {
 		this.router = Router();
 
 		this.getUser();
+		this.getUserWithEmail();
 		this.updateUser();
 	}
 
@@ -27,10 +28,12 @@ class UserRoute {
 
 		this.router.get<ReqParams>("/:id", verifyToken, async (req, res) => {
 			try {
-				const user = await userController.getUser(
+				const result = await userController.getUser(
 					new Types.ObjectId(req.params.id)
 				);
-				if (user) {
+				if (result.length > 0) {
+					const user = result[0];
+
 					res.status(200).send({
 						_id: user._id,
 						email: user.email,
@@ -43,6 +46,40 @@ class UserRoute {
 				res.status(400).send({ error: error.message });
 			}
 		});
+	}
+
+	/**
+	 * GET "/email/:email"
+	 * Find user with given email
+	 */
+	private getUserWithEmail() {
+		type ReqParams = { email: string };
+
+		this.router.get<ReqParams>(
+			"/email/:email",
+			verifyToken,
+			async (req, res) => {
+				try {
+					const result = await userController.getUserWithEmail(
+						req.params.email
+					);
+
+					if (result.length > 0) {
+						const user = result[0];
+
+						res.status(200).send({
+							_id: user._id,
+							email: user.email,
+							name: user.name,
+							auctions: user.auctions,
+							bids: user.bids,
+						});
+					} else throw new Error(`User ${req.params.email} does not exist`);
+				} catch (error: any) {
+					res.status(400).send({ error: error.message });
+				}
+			}
+		);
 	}
 
 	/**

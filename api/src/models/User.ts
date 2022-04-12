@@ -14,11 +14,13 @@ interface UserBase extends UserReqBody {
 }
 
 export interface User extends UserBase {
+	_id: Types.ObjectId;
 	auctions?: Auction["_id"][];
 	bids?: Bid["_id"][];
 }
 
 export interface UserExpanded extends UserBase {
+	_id: Types.ObjectId;
 	auctions?: Auction[];
 	bids?: Bid[];
 }
