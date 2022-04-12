@@ -130,6 +130,7 @@ class AuctionController {
 						status: { $first: "$status" },
 						highestBid: { $first: "$highestBid" },
 						bids: { $push: "$bids" },
+						winner: { $first: "$winner" },
 					},
 				},
 				{
