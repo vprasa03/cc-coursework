@@ -6,18 +6,14 @@ class AuctionItemController {
 	constructor(private model: Model<AuctionItem>) {}
 
 	/**
-	 * Find and update auction item with given id
-	 * @param itemId _id of the item to update
+	 * Bulk update auction items with new owners
 	 * @param data
 	 * @returns auction item
 	 */
-	public async updateAuctionItem(
-		itemId: AuctionItem["_id"],
-		data: Partial<AuctionItem>
-	) {
+	public async bulkUpdate(data: any[]) {
 		try {
-			const item = await this.model.findByIdAndUpdate(itemId, data).lean();
-			return item;
+			const res = await this.model.bulkWrite(data);
+			return res;
 		} catch (error) {
 			throw error;
 		}

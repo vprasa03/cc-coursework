@@ -26,43 +26,68 @@ class AuctionController {
 	 */
 	public async setClosedStatus(endDate: Auction["endDate"]) {
 		try {
-			const openAuctions = await this.model
-				.aggregate<Auction>([
-					{
-						$match: {
-							endDate,
-							status: AuctionStatus.open,
-						},
+			const openAuctions = await this.model.aggregate<Auction>([
+				{
+					$match: {
+						endDate,
+						status: AuctionStatus.open,
 					},
-					{
-						$lookup: {
-							from: "Bid",
-							localField: "highestBid",
-							foreignField: "_id",
-							as: "highestBid",
-						},
+				},
+				{
+					$lookup: {
+						from: "Bid",
+						localField: "highestBid",
+						foreignField: "_id",
+						as: "highestBid",
 					},
-				])
-				.limit(512);
-
+				},
+				{
+					$limit: 1000,
+				},
+			]);
 			if (openAuctions.length > 0) {
-				const closingAuctions = Promise.all(
-					openAuctions.map((auc) =>
-						this.model.findByIdAndUpdate(auc._id, {
-							status: AuctionStatus.closed,
-							...(auc.highestBid ? { winner: auc.highestBid[0].byUser } : {}),
-						})
-					)
-				);
-				const transferringOwners = Promise.all(
-					openAuctions.map((auc) =>
-						auctionItemController.updateAuctionItem(auc.item, {
-							...(auc.highestBid ? { ownedBy: auc.highestBid[0].byUser } : {}),
-						})
-					)
+				const bulkCloseAuctions = openAuctions.map((auc) => {
+					return {
+						updateOne: {
+							filter: { _id: auc._id },
+							update: {
+								status: AuctionStatus.closed,
+								...(auc.highestBid && auc.highestBid.length > 0
+									? { winner: auc.highestBid[0].byUser }
+									: {}),
+							},
+						},
+					};
+				});
+
+				const bulkTransferOwners = openAuctions.map((auc) => {
+					return {
+						updateOne: {
+							filter: { _id: auc.item },
+							update: {
+								$set: {
+									ownedBy:
+										auc.highestBid && auc.highestBid.length > 0
+											? auc.highestBid[0].byUser
+											: auc.by,
+								},
+							},
+						},
+					};
+				});
+
+				const res = await Promise.all([
+					this.model.bulkWrite(bulkCloseAuctions),
+					auctionItemController.bulkUpdate(bulkTransferOwners),
+				]);
+				console.log(
+					"Bulk close result:\n",
+					"Close auctions: ",
+					res[0],
+					"; Transfer owners: ",
+					res[1]
 				);
 
-				await Promise.all([closingAuctions, transferringOwners]);
 				this.setClosedStatus(endDate);
 			}
 		} catch (error) {
