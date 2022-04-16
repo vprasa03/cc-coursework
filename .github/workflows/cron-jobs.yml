@@ -53,4 +53,4 @@ jobs:
           context: .
           file: ./dockerfiles/cron-jobs
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/minibid-cron-jobs:latest, ${{ secrets.DOCKER_HUB_USERNAME }}/minibid-cron-jobs:${{ LATEST_VERSION }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/minibid-cron-jobs:latest, ${{ secrets.DOCKER_HUB_USERNAME }}/minibid-cron-jobs:${{ env.LATEST_VERSION }}
