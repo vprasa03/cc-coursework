@@ -49,6 +49,7 @@ jobs:
       # Compile src to dist
       - name: Compile src files
         run: |
+          rm -rf package-lock.json 
           npm install
           npm run build:jobs
 
