@@ -48,6 +48,9 @@ jobs:
 
       # Builds and pushes minibid cron jobs
       - name: Build and push cron jobs
+        run: |
+          LATEST_VERSION=$(grep "version" package.json | cut -d \" -f 4-4)
+          echo $LATEST_VERSION
         uses: docker/build-push-action@v2
         with:
           context: .
