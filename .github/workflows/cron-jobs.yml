@@ -48,7 +48,9 @@ jobs:
 
       # Compile src to dist
       - name: Compile src files
-        run: npm run build:jobs
+        run: |
+          npm install
+          npm run build:jobs
 
       # Builds and pushes minibid cron jobs
       - name: Build and push cron jobs
