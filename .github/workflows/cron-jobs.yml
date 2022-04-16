@@ -35,6 +35,7 @@ jobs:
       - name: Get latest version
         run: |
           LATEST_VERSION=$(grep "version" package.json | cut -d \" -f 4-4)
+          echo $LATEST_VERSION >> $GITHUB_ENV
 
       # Logs-in to Docker Hub
       - name: Login to Docker Hub
@@ -44,9 +45,6 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-
-      - name: Test env latest version
-        run: echo $LATEST_VERSION
 
       # Builds and pushes minibid cron jobs
       - name: Build and push cron jobs
