@@ -77,6 +77,7 @@ class AuctionItemRoute {
 				const validationErr = auctionItemValidation(req.body);
 				if (validationErr) throw new Error(validationErr);
 
+				// Find item if it exists
 				const auctionExists = await auctionController.getActiveAuctionByItem(
 					new Types.ObjectId(req.params.id)
 				);
@@ -84,14 +85,20 @@ class AuctionItemRoute {
 				if (auctionExists.length > 0) {
 					const auction = auctionExists[0];
 
+					// Check if item is in an active auction
 					if (auction.status !== AuctionStatus.entry)
 						throw new Error(`Active auction exists for ${req.params.id}`);
+
+					// Check that user owns item
 					if (!user.equals(auction.item[0].ownedBy))
 						throw new Error(`${user} does not own item ${req.params.id}`);
+
+					// Update item
 					await auctionItemController.updateAuctionItem(
 						new Types.ObjectId(req.params.id),
 						req.body
 					);
+
 					res.status(200).send({ ...auction.item, ...req.body });
 				} else throw new Error(`Item ${req.params.id} does not exist`);
 			} catch (error: any) {
