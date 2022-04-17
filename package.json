@@ -1,6 +1,6 @@
 {
 	"name": "cc-coursework",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"description": "Coursework for cloud computing module 2021-22",
 	"scripts": {
 		"start:api": "tsc -p api/src && node api/dist/index.js",

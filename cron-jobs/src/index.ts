@@ -15,6 +15,8 @@ function onDBConnect() {
 	cron.schedule("59 23 * * *", closeAuctions);
 	// Open auctions at 00:00 daily
 	cron.schedule("0 0 * * *", openAuctions);
+	// Log every minute
+	cron.schedule("* * * * *", () => console.log("Time: ", new Date().getTime()));
 }
 
 const dbUrl = envVars.parsed?.MURL; // Get MongoDB url
