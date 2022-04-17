@@ -66,3 +66,5 @@ jobs:
           file: ./dockerfiles/cron-jobs
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/minibid-cron-jobs:latest, ${{ secrets.DOCKER_HUB_USERNAME }}/minibid-cron-jobs:${{ env.LATEST_VERSION }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/minibid-cron-jobs:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/minibid-cron-jobs:buildcache,mode=max

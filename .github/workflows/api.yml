@@ -66,3 +66,5 @@ jobs:
           file: ./dockerfiles/api
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/minibid-api:latest, ${{ secrets.DOCKER_HUB_USERNAME }}/minibid-api:${{ env.LATEST_VERSION }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/minibid-api:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/minibid-api:buildcache,mode=max
