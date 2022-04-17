@@ -28,6 +28,7 @@ function connectDB(successCB: () => void) {
 		if (dbUrl) {
 			connect(dbUrl, (error) => {
 				if (isNativeError(error)) throw error;
+				console.log("MongoDB connection successful");
 				successCB();
 			});
 		} else {

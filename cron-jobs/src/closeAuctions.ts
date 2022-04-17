@@ -2,5 +2,7 @@ import { auctionController } from "./controllers";
 import { today } from "./utils";
 
 export const closeAuctions = () => {
-	auctionController.setClosedStatus(today());
+	const day = today();
+	console.log("Closing auctions for ", day);
+	auctionController.setClosedStatus(day);
 };
