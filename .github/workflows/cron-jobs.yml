@@ -22,7 +22,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # Checks for changes in cron-jobs folder
+      # Checks for file changes in cron-jobs/src
       - name: Check cron-jobs folder
         uses: dorny/paths-filter@v2
         id: filter
