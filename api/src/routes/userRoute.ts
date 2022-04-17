@@ -84,7 +84,7 @@ class UserRoute {
 
 	/**
 	 * PATCH "/"
-	 * Update authenticated user's details
+	 * Update authorized user's details
 	 */
 	private updateUser() {
 		type ReqBody = UserReqBody;
